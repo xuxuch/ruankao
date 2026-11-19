@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>软考打卡 · 27 周</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --card:#fff; --ink:#1c2430; --ink2:#5b6878; --ink3:#8d99a8;
+    --line:#e3e8ef; --brand:#1f4e79; --brand2:#2f6fa8;
+    --green:#2f9e5b; --green-l:#b7dfc3; --green-m:#6fc48b;
+    --red:#d9534f; --red-l:#f7e3e2;
+    --amber:#c9882b; --blue:#3b6fb6;
+    --r:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    font-size:15px;line-height:1.6;-webkit-text-size-adjust:100%;padding:18px 14px 48px}
+  .wrap{max-width:780px;width:100%;margin:0 auto}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px;max-width:100%;overflow:hidden}
+  .hide{display:none !important}
+
+  header.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+  h1{font-size:20px;margin:0 0 2px;letter-spacing:.2px}
+  .sub{color:var(--ink3);font-size:12.5px;margin:0}
+  .iconbtn{border:1px solid var(--line);background:#fff;color:var(--ink2);border-radius:10px;width:36px;height:36px;font-size:16px;cursor:pointer;flex:0 0 auto}
+  .iconbtn:hover{border-color:#c9d3df;color:var(--brand)}
+
+  .count{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+  .pill{background:#eef3f9;color:var(--brand);border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:600}
+  .pill.warn{background:#fdf1e3;color:#a5691c}
+  .pill.hot{background:#fdeceb;color:#b4372f}
+  .pill.ok{background:#e8f6ed;color:#1f7a44}
+
+  nav.tabs{display:flex;gap:6px;background:#e9edf3;border-radius:12px;padding:4px;margin-bottom:14px}
+  nav.tabs button{flex:1;border:0;background:transparent;padding:9px 6px;border-radius:9px;font-size:14px;color:var(--ink2);cursor:pointer;font-weight:600}
+  nav.tabs button.on{background:#fff;color:var(--brand);box-shadow:0 1px 3px rgba(20,30,50,.08)}
+
+  .today{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}
+  .today .d{font-size:17px;font-weight:700}
+  .today .w{color:var(--ink3);font-size:12.5px;margin-left:8px;font-weight:400}
+  .habit{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+  .habit:first-of-type{border-top:none}
+  .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+  .hname{font-weight:600;min-width:44px}
+  .streak{font-size:12.5px;color:var(--ink3)}
+  .streak b{color:var(--ink);font-size:13.5px}
+  .spacer{flex:1}
+  .btns{display:flex;gap:8px}
+  .btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 13px;font-size:13.5px;cursor:pointer;color:var(--ink2);transition:.15s}
+  .btn:hover{border-color:#c9d3df}
+  .btn.on-yes{background:#e8f6ed;border-color:#8fd3a8;color:#1f7a44;font-weight:600}
+  .btn.on-no{background:#fdecea;border-color:#eba6a2;color:#b4372f;font-weight:600}
+  .note{margin-top:12px}
+  input.txt{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13.5px;color:var(--ink);background:#fbfcfe}
+  input.txt:focus{outline:none;border-color:var(--brand2);background:#fff}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .stat{background:#fbfcfe;border:1px solid var(--line);border-radius:12px;padding:12px}
+  .stat .t{font-size:12.5px;color:var(--ink3);display:flex;align-items:center;gap:6px}
+  .stat .n{font-size:24px;font-weight:700;line-height:1.2;margin-top:4px}
+  .stat .m{font-size:12px;color:var(--ink3)}
+  .stat .n span{font-size:12.5px;font-weight:500;color:var(--ink3);margin-left:2px}
+
+  h2{font-size:14px;margin:0 0 12px;color:var(--ink2);font-weight:700;letter-spacing:.3px}
+  .heat{overflow-x:auto;width:100%;min-width:0;padding-bottom:6px}
+  .heat table{border-collapse:separate;border-spacing:3px;margin:0 auto}
+  .heat th{font-size:10.5px;color:var(--ink3);font-weight:500;padding:0 0 2px;text-align:center;min-width:14px}
+  .heat td{padding:0}
+  .heat .cell{width:14px;height:14px;border-radius:4px;background:#edeff3;position:relative;cursor:pointer}
+  .heat .cell.l1{background:var(--green-l)}
+  .heat .cell.l2{background:var(--green-m)}
+  .heat .cell.l3{background:var(--green)}
+  .heat .cell.off{background:transparent;cursor:default}
+  .heat .cell.bad::after{content:"";position:absolute;right:-1px;top:-1px;width:5px;height:5px;border-radius:50%;background:var(--red)}
+  .heat .cell.today{outline:2px solid #c9882b;outline-offset:1px}
+  .heat .cell.future{background:#f7f8fa;box-shadow:inset 0 0 0 1px #eef0f4;cursor:default}
+  .heat .rowlab{font-size:10.5px;color:var(--ink3);text-align:right;padding-right:4px;white-space:nowrap}
+  .legend{display:flex;gap:12px;align-items:center;margin-top:10px;font-size:11.5px;color:var(--ink3);flex-wrap:wrap}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+
+  .recent{list-style:none;margin:0;padding:0}
+  .recent li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13.5px}
+  .recent li:first-child{border-top:none}
+  .recent .dt{color:var(--ink2);min-width:78px}
+  .recent .wd{color:var(--ink3);font-size:12px;min-width:26px}
+  .recent .marks{display:flex;gap:5px}
+  .mk{width:20px;height:20px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:11.5px;color:#fff;font-weight:700}
+  .mk.y{background:var(--green)}
+  .mk.n{background:var(--red)}
+  .mk.e{background:#e6eaf0;color:#b3bdca}
+  .recent .nt{color:var(--ink3);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  .foot{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+  .ghost{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 14px;font-size:13px;color:var(--ink2);cursor:pointer}
+  .ghost:hover{border-color:#c9d3df;color:var(--brand)}
+  .ghost.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  .ghost.primary:hover{background:#183f63;color:#fff}
+  .hint{font-size:12px;color:var(--ink3);margin-top:10px}
+
+  /* ---------- 单词页 ---------- */
+  .plan-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .seg{display:flex;gap:6px}
+  .seg button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 12px;font-size:13px;cursor:pointer;color:var(--ink2)}
+  .seg button.on{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+  .kpi{background:#fbfcfe;border:1px solid var(--line);border-radius:12px;padding:11px 12px}
+  .kpi .k{font-size:12px;color:var(--ink3)}
+  .kpi .v{font-size:19px;font-weight:700;margin-top:2px}
+  .bigbtn{width:100%;border:0;background:var(--brand);color:#fff;border-radius:12px;padding:14px;font-size:16px;font-weight:700;cursor:pointer}
+  .bigbtn:hover{background:#183f63}
+  .bigbtn.sec{background:#fff;color:var(--brand);border:1px solid #c9d6e4;margin-top:10px;font-size:14px;padding:11px}
+
+  .wrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+  .wrow:first-child{border-top:none}
+  .wrow .w{font-weight:600}
+  .wrow .ipa{color:var(--ink3);font-size:12.5px;font-family:"Segoe UI","Lucida Sans Unicode",sans-serif}
+  .wrow .cn{color:var(--ink2);font-size:13px}
+  .wrow .badge{background:#fdecea;color:#b4372f;border-radius:999px;padding:1px 8px;font-size:11.5px;font-weight:600}
+  .wrow .acts{margin-left:auto;display:flex;gap:6px}
+  .mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 9px;font-size:12px;color:var(--ink2);cursor:pointer}
+  .mini:hover{border-color:#c9d3df;color:var(--brand)}
+  .empty{color:var(--ink3);font-size:13.5px;text-align:center;padding:18px 0}
+
+  /* ---------- 学习会话 ---------- */
+  .overlay{position:fixed;inset:0;background:#f4f6f9;z-index:60;display:none;overflow-y:auto;padding:18px 14px 40px}
+  .overlay.show{display:block}
+  .ovwrap{max-width:560px;margin:0 auto}
+  .ovtop{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .ovtop .close{border:0;background:transparent;font-size:20px;color:var(--ink3);cursor:pointer;padding:2px 6px}
+  .bar{flex:1;height:6px;background:#e3e8ef;border-radius:99px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--green);width:0;transition:width .25s}
+  .ovmeta{font-size:12.5px;color:var(--ink3);margin-bottom:14px;display:flex;justify-content:space-between}
+
+  .wcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px 20px;text-align:center;margin-bottom:14px}
+  .wcard .big{font-size:34px;font-weight:700;letter-spacing:.4px;line-height:1.25;word-break:break-word}
+  .wcard .ipa{color:var(--ink3);font-size:15px;margin-top:6px;font-family:"Segoe UI","Lucida Sans Unicode",sans-serif}
+  .wcard .cn{color:var(--ink2);font-size:15px;margin-top:10px}
+  .wcard .cat{color:#9aa6b4;font-size:12px;margin-top:10px}
+  .speak{border:1px solid #cfe0ef;background:#f2f8fd;color:var(--brand);border-radius:999px;padding:8px 18px;font-size:14px;cursor:pointer;margin-top:14px}
+  .speak:hover{background:#e6f2fb}
+  .qtext{text-align:center;color:var(--ink2);font-size:14px;margin-bottom:14px}
+  .mask{text-align:center;font-size:34px;letter-spacing:1px;font-weight:700;font-family:Consolas,Menlo,monospace;margin:6px 0 16px;word-break:break-word}
+  .mask em{color:var(--green);font-style:normal;border-bottom:3px solid var(--green)}
+  .answer{width:100%;border:2px solid #cfe0ef;border-radius:12px;padding:14px 16px;font-size:20px;text-align:center;font-family:Consolas,Menlo,monospace;background:#fff}
+  .answer:focus{outline:none;border-color:var(--brand2)}
+  .submit{width:100%;margin-top:12px;border:0;background:var(--brand);color:#fff;border-radius:12px;padding:14px;font-size:16px;font-weight:700;cursor:pointer}
+  .submit:hover{background:#183f63}
+  .fb{border-radius:14px;padding:16px;margin-top:14px;font-size:14px}
+  .fb.ok{background:#eaf7ef;border:1px solid #a9dcbc;color:#1f7a44}
+  .fb.no{background:#fdeeec;border:1px solid #efb6b1;color:#a5322b}
+  .fb .ans{font-size:22px;font-weight:700;margin:6px 0 2px}
+  .fb .ipa{font-size:13px;opacity:.75;font-family:"Segoe UI","Lucida Sans Unicode",sans-serif}
+  .nextbtn{width:100%;margin-top:12px;border:0;background:#2b3a4d;color:#fff;border-radius:12px;padding:14px;font-size:16px;font-weight:700;cursor:pointer}
+
+  .modal{position:fixed;inset:0;background:rgba(20,28,40,.42);display:none;align-items:center;justify-content:center;padding:18px;z-index:70}
+  .modal.show{display:flex}
+  .sheet{background:#fff;border-radius:16px;max-width:440px;width:100%;padding:20px;max-height:86vh;overflow:auto}
+  .sheet h3{margin:0 0 14px;font-size:16px}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:12.5px;color:var(--ink3);margin-bottom:5px}
+  .field input{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:14px}
+  .row{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+
+  @media (max-width:520px){
+    body{padding:14px 10px 40px;overflow-x:hidden}
+    .card{padding:15px 14px}
+    .stats{grid-template-columns:1fr;gap:8px}
+    .stat{display:block;padding:11px 13px}
+    .stat .n{font-size:21px;margin-top:2px}
+    .habit{flex-wrap:wrap;row-gap:8px}
+    .habit .spacer{display:none}
+    .habit .btns{margin-left:auto}
+    .heat{margin:0 -4px}
+    .heat table{border-spacing:2px}
+    .heat th{font-size:9.5px;min-width:10px}
+    .heat .cell{width:10px;height:10px;border-radius:3px}
+    .legend{gap:8px 10px}
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .wcard .big{font-size:28px}
+    .mask{font-size:26px;letter-spacing:4px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>软考打卡 · 27 周</h1>
+      <p class="sub" id="subline">加载中…</p>
+      <div class="count" id="counts"></div>
+    </div>
+    <button class="iconbtn" id="btnSet" title="设置">⚙</button>
+  </header>
+
+  <nav class="tabs">
+    <button data-view="checkin" class="on">打卡</button>
+    <button data-view="words">单词</button>
+    <button data-view="wrong">错题本</button>
+  </nav>
+
+  <!-- ========== 打卡 ========== -->
+  <div id="view-checkin">
+    <section class="card">
+      <div class="today">
+        <div><span class="d" id="todayDate">—</span><span class="w" id="todayWeek">—</span></div>
+        <div class="streak" id="weekProgress"></div>
+      </div>
+      <div id="habitRows"></div>
+      <div class="note">
+        <input class="txt" id="noteInput" placeholder="今天想记一句？比如“算法 C 填空错了 3 道”（可留空）" maxlength="80">
+      </div>
+    </section>
+
+    <section class="stats" id="statsRow"></section>
+
+    <section class="card">
+      <h2>打卡热力图</h2>
+      <div class="heat" id="heat"></div>
+      <div class="legend">
+        <span><i style="background:#edeff3"></i>未打</span>
+        <span><i style="background:var(--green-l)"></i>1 项</span>
+        <span><i style="background:var(--green-m)"></i>2 项</span>
+        <span><i style="background:var(--green)"></i>3 项</span>
+        <span><i style="background:var(--red);border-radius:50%"></i>当天有 ✗</span>
+        <span>点格子可改当天状态</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>最近 14 天</h2>
+      <ul class="recent" id="recent"></ul>
+    </section>
+
+    <div class="foot">
+      <button class="ghost" id="btnSync">立即同步</button>
+      <button class="ghost" id="btnExport">导出 JSON</button>
+      <button class="ghost" id="btnCsv">导出 CSV</button>
+      <button class="ghost" id="btnImport">导入 JSON</button>
+      <input type="file" id="fileIn" accept=".json,application/json" style="display:none">
+    </div>
+    <p class="hint">数据默认只存在这台设备的浏览器里。点右上角 ⚙ 可以绑定 GitHub Gist 做云端同步，或把 html 放进「启动同步服务.bat」的目录做局域网同步。</p>
+  </div>
+
+  <!-- ========== 单词 ========== -->
+  <div id="view-words" class="hide">
+    <section class="card">
+      <div class="plan-row">
+        <div>
+          <div style="font-weight:700;font-size:15px">今天记几个？</div>
+          <div class="hint" style="margin-top:2px">按 27 周排的话，每天 10–15 个刚好覆盖 366 词</div>
+        </div>
+        <div class="seg" id="dailySeg">
+          <button data-n="5">5</button>
+          <button data-n="10">10</button>
+          <button data-n="15">15</button>
+          <button data-n="20">20</button>
+        </div>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="k">已学</div><div class="v" id="kStudied">0</div></div>
+        <div class="kpi"><div class="k">已掌握</div><div class="v" id="kMastered">0</div></div>
+        <div class="kpi"><div class="k">错题本</div><div class="v" id="kWrong">0</div></div>
+        <div class="kpi"><div class="k">今天已练</div><div class="v" id="kToday">0</div></div>
+      </div>
+      <button class="bigbtn" id="btnStart">开始今天的记忆</button>
+      <button class="bigbtn sec" id="btnPreviewAll">先浏览今天的词（不测验）</button>
+      <p class="hint" id="wordHint"></p>
+    </section>
+
+    <section class="card">
+      <h2>今天的词</h2>
+      <div id="todayWords"><div class="empty">还没开始，点上面的按钮</div></div>
+    </section>
+  </div>
+
+  <!-- ========== 错题本 ========== -->
+  <div id="view-wrong" class="hide">
+    <section class="card">
+      <h2>错题本</h2>
+      <div id="wrongList"><div class="empty">还没有错词。答错的词会自动进这里。</div></div>
+      <div class="foot" style="margin-top:14px">
+        <button class="ghost primary" id="btnPracticeWrong">练一遍错题</button>
+        <button class="ghost" id="btnClearWrong">清空错题本</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ========== 学习会话 ========== -->
+<div class="overlay" id="overlay">
+  <div class="ovwrap">
+    <div class="ovtop">
+      <button class="close" id="ovClose">✕</button>
+      <div class="bar"><i id="ovBar"></i></div>
+      <div style="font-size:12.5px;color:#8d99a8" id="ovCount">0/0</div>
+    </div>
+    <div class="ovmeta"><span id="ovPhase">先看一遍</span><span id="ovStat"></span></div>
+    <div id="ovBody"></div>
+  </div>
+</div>
+
+<!-- ========== 设置 ========== -->
+<div class="modal" id="modal">
+  <div class="sheet">
+    <h3>设置</h3>
+    <div class="field"><label>预计考试日</label><input type="date" id="examInput"></div>
+    <div class="field"><label>周计划起始日</label><input type="date" id="startInput"></div>
+    <hr style="border:none;border-top:1px solid #e3e8ef;margin:16px 0">
+    <div class="field">
+      <label>GitHub Token（用于云同步，仅需 gist 权限）</label>
+      <input type="password" id="tokenInput" placeholder="ghp_… 或 github_pat_…">
+    </div>
+    <div class="field">
+      <label>Gist ID（留空则在第一次同步时自动创建）</label>
+      <input type="text" id="gistInput" placeholder="自动创建后自动填入">
+    </div>
+    <div class="row" style="justify-content:flex-start">
+      <button class="ghost" id="btnCloud">立即云同步</button>
+      <button class="ghost" id="btnCloudClear">清除云端配置</button>
+    </div>
+    <div class="hint" id="cloudHint">Token 只存在本机浏览器里。在 GitHub → Settings → Developer settings → Personal access tokens 生成，勾选 gist 即可。</div>
+    <hr style="border:none;border-top:1px solid #e3e8ef;margin:16px 0">
+    <div class="row">
+      <button class="ghost" id="btnClear">清空全部打卡</button>
+      <button class="ghost primary" id="btnClose" style="background:var(--brand);border-color:var(--brand);color:#fff">完成</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= 词库（内嵌） ================= */
+var VOCAB = [{"w":"data representation","p":"ˈdætə ˌrɛprəzɛnˈteɪʃən","c":"数据表示","cat":"计算机组成与体系结构","s":2},{"w":"binary","p":"ˈbaɪnəˌri","c":"二进制","cat":"计算机组成与体系结构","s":3},{"w":"hexadecimal","p":"ˌhɛksəˈdɛsɪməl","c":"十六进制","cat":"计算机组成与体系结构","s":2},{"w":"bit","p":"bɪt","c":"位","cat":"计算机组成与体系结构","s":3},{"w":"byte","p":"baɪt","c":"字节","cat":"计算机组成与体系结构","s":3},{"w":"word","p":"wərd","c":"字、字长","cat":"计算机组成与体系结构","s":2},{"w":"complement","p":"ˈkɑmpləmənt","c":"补码","cat":"计算机组成与体系结构","s":2},{"w":"two's complement","p":"tuz ˈkɑmpləmənt","c":"二进制补码","cat":"计算机组成与体系结构","s":3},{"w":"sign bit","p":"saɪn bɪt","c":"符号位","cat":"计算机组成与体系结构","s":2},{"w":"overflow","p":"ˌoʊvərˈfloʊ","c":"溢出","cat":"计算机组成与体系结构","s":2},{"w":"floating point","p":"ˈfloʊtɪŋ pɔɪnt","c":"浮点数","cat":"计算机组成与体系结构","s":3},{"w":"mantissa","p":"mænˈtɪsə","c":"尾数","cat":"计算机组成与体系结构","s":1},{"w":"exponent","p":"ˈɛkˌspoʊnənt","c":"阶码、指数","cat":"计算机组成与体系结构","s":1},{"w":"instruction set","p":"ˌɪnˈstrəkʃən sɛt","c":"指令集","cat":"计算机组成与体系结构","s":3},{"w":"addressing mode","p":"æˈdrɛsɪŋ moʊd","c":"寻址方式","cat":"计算机组成与体系结构","s":2},{"w":"opcode","p":"ˈɑpˌkoʊd","c":"操作码","cat":"计算机组成与体系结构","s":2},{"w":"operand","p":"ˈɑpəˌrænd","c":"操作数","cat":"计算机组成与体系结构","s":2},{"w":"register","p":"ˈrɛʤɪstər","c":"寄存器","cat":"计算机组成与体系结构","s":3},{"w":"program counter","p":"ˈproʊˌgræm ˈkaʊntər","c":"程序计数器","cat":"计算机组成与体系结构","s":2},{"w":"accumulator","p":"əˈkjumjəˌleɪtər","c":"累加器","cat":"计算机组成与体系结构","s":1},{"w":"arithmetic logic unit","p":"ˌɛrɪθˈmɛtɪk ˈlɑʤɪk ˈjunɪt","c":"算术逻辑单元","cat":"计算机组成与体系结构","s":3},{"w":"control unit","p":"kənˈtroʊl ˈjunɪt","c":"控制器","cat":"计算机组成与体系结构","s":2},{"w":"cache","p":"kæˈʃeɪ","c":"高速缓存","cat":"计算机组成与体系结构","s":3},{"w":"hit rate","p":"hɪt reɪt","c":"命中率","cat":"计算机组成与体系结构","s":3},{"w":"locality","p":"loʊˈkæləti","c":"局部性","cat":"计算机组成与体系结构","s":2},{"w":"main memory","p":"meɪn ˈmɛməri","c":"主存储器","cat":"计算机组成与体系结构","s":3},{"w":"memory hierarchy","p":"ˈmɛməri ˈhaɪˌrɑrki","c":"存储层次","cat":"计算机组成与体系结构","s":2},{"w":"bus","p":"bəs","c":"总线","cat":"计算机组成与体系结构","s":3},{"w":"pipeline","p":"ˈpaɪˌplaɪn","c":"流水线","cat":"计算机组成与体系结构","s":3},{"w":"throughput","p":"θˈruˌpʊt","c":"吞吐量","cat":"计算机组成与体系结构","s":3},{"w":"clock cycle","p":"klɑk ˈsaɪkəl","c":"时钟周期","cat":"计算机组成与体系结构","s":2},{"w":"CISC","p":"sɪsk","c":"复杂指令集计算机","cat":"计算机组成与体系结构","s":2},{"w":"RISC","p":"rɪsk","c":"精简指令集计算机","cat":"计算机组成与体系结构","s":2},{"w":"interrupt","p":"ˌɪntərˈəpt","c":"中断","cat":"计算机组成与体系结构","s":3},{"w":"direct memory access","p":"dɪˈrɛkt ˈmɛməri ˈækˌsɛs","c":"直接内存访问","cat":"计算机组成与体系结构","s":2},{"w":"embedded system","p":"ɛmˈbɛdɪd ˈsɪstəm","c":"嵌入式系统","cat":"计算机组成与体系结构","s":2},{"w":"von Neumann architecture","p":"vɔn ˈnumən ˈɑrkəˌtɛkʧər","c":"冯·诺依曼体系结构","cat":"计算机组成与体系结构","s":2},{"w":"reliability","p":"riˌlaɪəˈbɪləti","c":"可靠性","cat":"计算机组成与体系结构","s":3},{"w":"redundancy","p":"rɪˈdəndənsi","c":"冗余","cat":"计算机组成与体系结构","s":2},{"w":"process","p":"ˈprɔˌsɛs","c":"进程","cat":"操作系统","s":3},{"w":"thread","p":"θrɛd","c":"线程","cat":"操作系统","s":3},{"w":"kernel","p":"ˈkərnəl","c":"内核","cat":"操作系统","s":3},{"w":"system call","p":"ˈsɪstəm kɔl","c":"系统调用","cat":"操作系统","s":3},{"w":"context switch","p":"ˈkɑntɛkst swɪʧ","c":"上下文切换","cat":"操作系统","s":2},{"w":"scheduling","p":"ˈskɛʤʊlɪŋ","c":"调度","cat":"操作系统","s":3},{"w":"preemptive","p":"priˈɛmptɪv","c":"抢占式的","cat":"操作系统","s":2},{"w":"time slice","p":"taɪm slaɪs","c":"时间片","cat":"操作系统","s":2},{"w":"deadlock","p":"ˈdɛˌdlɑk","c":"死锁","cat":"操作系统","s":3},{"w":"starvation","p":"stɑrˈveɪʃən","c":"饥饿","cat":"操作系统","s":2},{"w":"semaphore","p":"ˈsɛməˌfɔr","c":"信号量","cat":"操作系统","s":3},{"w":"mutex","p":"ˈmjuˌtɛks","c":"互斥锁","cat":"操作系统","s":2},{"w":"critical section","p":"ˈkrɪtɪkəl ˈsɛkʃən","c":"临界区","cat":"操作系统","s":3},{"w":"mutual exclusion","p":"mˈjuʧuəl ɪkˈskluʒən","c":"互斥","cat":"操作系统","s":2},{"w":"synchronization","p":"ˌsɪŋkrənəˈzeɪʃən","c":"同步","cat":"操作系统","s":3},{"w":"paging","p":"ˈpeɪʤɪŋ","c":"分页","cat":"操作系统","s":3},{"w":"segmentation","p":"ˌsɛgmənˈteɪʃən","c":"分段","cat":"操作系统","s":2},{"w":"page fault","p":"peɪʤ fɔlt","c":"缺页","cat":"操作系统","s":3},{"w":"thrashing","p":"θˈræʃɪŋ","c":"抖动、颠簸","cat":"操作系统","s":2},{"w":"page replacement","p":"peɪʤ rɪˈpleɪsmənt","c":"页面置换","cat":"操作系统","s":2},{"w":"file system","p":"faɪl ˈsɪstəm","c":"文件系统","cat":"操作系统","s":3},{"w":"directory","p":"dɪˈrɛktəri","c":"目录","cat":"操作系统","s":2},{"w":"disk scheduling","p":"dɪsk ˈskɛʤʊlɪŋ","c":"磁盘调度","cat":"操作系统","s":2},{"w":"spooling","p":"ˈspulɪŋ","c":"假脱机","cat":"操作系统","s":1},{"w":"interrupt handler","p":"ˌɪntərˈəpt ˈhændələr","c":"中断处理程序","cat":"操作系统","s":2},{"w":"batch processing","p":"bæʧ ˈprɑsɛsɪŋ","c":"批处理","cat":"操作系统","s":2},{"w":"time-sharing","p":"taɪm ˈʃɛrɪŋ","c":"分时","cat":"操作系统","s":2},{"w":"real-time","p":"ˈrilˌtaɪm","c":"实时","cat":"操作系统","s":2},{"w":"multiprogramming","p":"ˌmʌltiˈproʊˌgræmɪŋ","c":"多道程序设计","cat":"操作系统","s":2},{"w":"buffer","p":"ˈbəfər","c":"缓冲区","cat":"操作系统","s":3},{"w":"pipe","p":"paɪp","c":"管道","cat":"操作系统","s":2},{"w":"shell","p":"ʃɛl","c":"命令解释器","cat":"操作系统","s":2},{"w":"daemon","p":"ˈdimən","c":"守护进程","cat":"操作系统","s":1},{"w":"fork","p":"fɔrk","c":"创建子进程","cat":"操作系统","s":1},{"w":"array","p":"əreɪ","c":"数组","cat":"数据结构与算法","s":3},{"w":"linked list","p":"lɪŋkt lɪst","c":"链表","cat":"数据结构与算法","s":3},{"w":"stack","p":"stæk","c":"栈","cat":"数据结构与算法","s":3},{"w":"queue","p":"kju","c":"队列","cat":"数据结构与算法","s":3},{"w":"deque","p":"dɛk","c":"双端队列","cat":"数据结构与算法","s":1},{"w":"tree","p":"tri","c":"树","cat":"数据结构与算法","s":3},{"w":"binary tree","p":"ˈbaɪnəˌri tri","c":"二叉树","cat":"数据结构与算法","s":3},{"w":"root","p":"rut","c":"根结点","cat":"数据结构与算法","s":3},{"w":"leaf","p":"lif","c":"叶子结点","cat":"数据结构与算法","s":3},{"w":"node","p":"noʊd","c":"结点","cat":"数据结构与算法","s":3},{"w":"subtree","p":"ˈsʌbˌtri","c":"子树","cat":"数据结构与算法","s":2},{"w":"binary search tree","p":"ˈbaɪnəˌri sərʧ tri","c":"二叉排序树","cat":"数据结构与算法","s":3},{"w":"balanced tree","p":"ˈbælənst tri","c":"平衡树","cat":"数据结构与算法","s":2},{"w":"heap","p":"hip","c":"堆","cat":"数据结构与算法","s":3},{"w":"graph","p":"græf","c":"图","cat":"数据结构与算法","s":3},{"w":"vertex","p":"ˈvərˌtɛks","c":"顶点","cat":"数据结构与算法","s":3},{"w":"edge","p":"ɛʤ","c":"边","cat":"数据结构与算法","s":3},{"w":"adjacency matrix","p":"əˈdʒeɪsənsi ˈmeɪtrɪks","c":"邻接矩阵","cat":"数据结构与算法","s":3},{"w":"adjacency list","p":"əˈdʒeɪsənsi lɪst","c":"邻接表","cat":"数据结构与算法","s":3},{"w":"traversal","p":"trəˈvərsəl","c":"遍历","cat":"数据结构与算法","s":3},{"w":"preorder","p":"priˈɔrdər","c":"先序遍历","cat":"数据结构与算法","s":3},{"w":"inorder","p":"ɪnˈɔrdər","c":"中序遍历","cat":"数据结构与算法","s":3},{"w":"postorder","p":"poʊstˈɔrdər","c":"后序遍历","cat":"数据结构与算法","s":3},{"w":"breadth-first search","p":"brɛdθ fərst sərʧ","c":"广度优先搜索","cat":"数据结构与算法","s":3},{"w":"depth-first search","p":"dɛpθ fərst sərʧ","c":"深度优先搜索","cat":"数据结构与算法","s":3},{"w":"hash table","p":"hæʃ ˈteɪbəl","c":"散列表、哈希表","cat":"数据结构与算法","s":3},{"w":"collision","p":"kəˈlɪʒən","c":"冲突","cat":"数据结构与算法","s":3},{"w":"load factor","p":"loʊd ˈfæktər","c":"装填因子","cat":"数据结构与算法","s":2},{"w":"sorting","p":"ˈsɔrtɪŋ","c":"排序","cat":"数据结构与算法","s":3},{"w":"quicksort","p":"ˈkwɪkˌsɔrt","c":"快速排序","cat":"数据结构与算法","s":3},{"w":"merge sort","p":"mərʤ sɔrt","c":"归并排序","cat":"数据结构与算法","s":3},{"w":"heap sort","p":"hip sɔrt","c":"堆排序","cat":"数据结构与算法","s":3},{"w":"insertion sort","p":"ˌɪnˈsərʃən sɔrt","c":"直接插入排序","cat":"数据结构与算法","s":3},{"w":"bubble sort","p":"ˈbəbəl sɔrt","c":"冒泡排序","cat":"数据结构与算法","s":2},{"w":"selection sort","p":"səˈlɛkʃən sɔrt","c":"简单选择排序","cat":"数据结构与算法","s":2},{"w":"shell sort","p":"ʃɛl sɔrt","c":"希尔排序","cat":"数据结构与算法","s":2},{"w":"radix sort","p":"ˈreɪdɪks sɔrt","c":"基数排序","cat":"数据结构与算法","s":2},{"w":"time complexity","p":"taɪm kəmˈplɛksɪti","c":"时间复杂度","cat":"数据结构与算法","s":3},{"w":"space complexity","p":"speɪs kəmˈplɛksɪti","c":"空间复杂度","cat":"数据结构与算法","s":3},{"w":"worst case","p":"wərst keɪs","c":"最坏情况","cat":"数据结构与算法","s":3},{"w":"average case","p":"ˈævərɪʤ keɪs","c":"平均情况","cat":"数据结构与算法","s":2},{"w":"recursion","p":"rɪˈkərʒən","c":"递归","cat":"数据结构与算法","s":3},{"w":"iteration","p":"ˌɪtəˈreɪʃən","c":"迭代","cat":"数据结构与算法","s":3},{"w":"divide and conquer","p":"dɪˈvaɪd ənd ˈkɑŋkər","c":"分治法","cat":"数据结构与算法","s":3},{"w":"dynamic programming","p":"daɪˈnæmɪk ˈproʊˌgræmɪŋ","c":"动态规划","cat":"数据结构与算法","s":3},{"w":"greedy algorithm","p":"ˈgridi ˈælgərˌɪðəm","c":"贪心算法","cat":"数据结构与算法","s":3},{"w":"backtracking","p":"ˈbækˌtrækɪŋ","c":"回溯法","cat":"数据结构与算法","s":3},{"w":"branch and bound","p":"brænʧ ənd baʊnd","c":"分支限界法","cat":"数据结构与算法","s":2},{"w":"minimum spanning tree","p":"ˈmɪnəməm ˈspænɪŋ tri","c":"最小生成树","cat":"数据结构与算法","s":3},{"w":"shortest path","p":"ˈʃɔrtɪst pæθ","c":"最短路径","cat":"数据结构与算法","s":3},{"w":"topological sort","p":"təpəˈlɑʤɪkəl sɔrt","c":"拓扑排序","cat":"数据结构与算法","s":2},{"w":"string matching","p":"strɪŋ ˈmæʧɪŋ","c":"字符串匹配","cat":"数据结构与算法","s":2},{"w":"database","p":"ˈdætəˌbeɪs","c":"数据库","cat":"数据库","s":3},{"w":"database management system","p":"ˈdætəˌbeɪs ˈmænɪʤmənt ˈsɪstəm","c":"数据库管理系统","cat":"数据库","s":3},{"w":"schema","p":"ˈskimə","c":"模式","cat":"数据库","s":2},{"w":"relation","p":"riˈleɪʃən","c":"关系","cat":"数据库","s":3},{"w":"tuple","p":"ˈtʌpəl","c":"元组","cat":"数据库","s":3},{"w":"attribute","p":"əˈtrɪˌbjut","c":"属性","cat":"数据库","s":3},{"w":"primary key","p":"ˈpraɪˌmɛri ki","c":"主键","cat":"数据库","s":3},{"w":"foreign key","p":"ˈfɔrən ki","c":"外键","cat":"数据库","s":3},{"w":"candidate key","p":"ˈkænədɪt ki","c":"候选键","cat":"数据库","s":2},{"w":"index","p":"ˈɪndɛks","c":"索引","cat":"数据库","s":3},{"w":"view","p":"vju","c":"视图","cat":"数据库","s":3},{"w":"join","p":"ʤɔɪn","c":"连接","cat":"数据库","s":3},{"w":"natural join","p":"ˈnæʧərəl ʤɔɪn","c":"自然连接","cat":"数据库","s":3},{"w":"projection","p":"prɑˈʤɛkʃən","c":"投影","cat":"数据库","s":3},{"w":"selection","p":"səˈlɛkʃən","c":"选择","cat":"数据库","s":3},{"w":"normalization","p":"ˌnɔrməlɪˈzeɪʃən","c":"规范化","cat":"数据库","s":3},{"w":"functional dependency","p":"ˈfəŋkʃənəl dɪˈpɛndənsi","c":"函数依赖","cat":"数据库","s":3},{"w":"transaction","p":"trænˈzækʃən","c":"事务","cat":"数据库","s":3},{"w":"atomicity","p":"ˌætəˈmɪsəti","c":"原子性","cat":"数据库","s":3},{"w":"consistency","p":"kənˈsɪstənsi","c":"一致性","cat":"数据库","s":3},{"w":"isolation","p":"ˌaɪsəˈleɪʃən","c":"隔离性","cat":"数据库","s":3},{"w":"durability","p":"dərəˈbɪlɪti","c":"持久性","cat":"数据库","s":3},{"w":"commit","p":"kəˈmɪt","c":"提交","cat":"数据库","s":3},{"w":"rollback","p":"ˈroʊlˌbæk","c":"回滚","cat":"数据库","s":3},{"w":"concurrency control","p":"kənˈkərənsi kənˈtroʊl","c":"并发控制","cat":"数据库","s":3},{"w":"locking","p":"ˈlɑkɪŋ","c":"封锁","cat":"数据库","s":2},{"w":"two-phase locking","p":"tu feɪz ˈlɑkɪŋ","c":"两段锁协议","cat":"数据库","s":2},{"w":"isolation level","p":"ˌaɪsəˈleɪʃən ˈlɛvəl","c":"隔离级别","cat":"数据库","s":2},{"w":"backup","p":"ˈbæˌkəp","c":"备份","cat":"数据库","s":3},{"w":"recovery","p":"rɪˈkəvəri","c":"恢复","cat":"数据库","s":2},{"w":"replication","p":"ˌrɛplɪˈkeɪʃən","c":"复制","cat":"数据库","s":2},{"w":"sharding","p":"ˈʃɑrdɪŋ","c":"分片","cat":"数据库","s":1},{"w":"stored procedure","p":"stɔrd prəˈsiʤər","c":"存储过程","cat":"数据库","s":2},{"w":"trigger","p":"ˈtrɪgər","c":"触发器","cat":"数据库","s":2},{"w":"data warehouse","p":"ˈdætə ˈwɛˌrhaʊs","c":"数据仓库","cat":"数据库","s":2},{"w":"online transaction processing","p":"ˈɔnˌlaɪn trænˈzækʃən ˈprɑsɛsɪŋ","c":"联机事务处理","cat":"数据库","s":1},{"w":"query optimization","p":"kˈwiri ɑptɪmɪˈzeɪʃən","c":"查询优化","cat":"数据库","s":2},{"w":"integrity constraint","p":"ˌɪnˈtɛgrəti kənˈstreɪnt","c":"完整性约束","cat":"数据库","s":2},{"w":"protocol","p":"ˈproʊtəˌkɔl","c":"协议","cat":"计算机网络","s":3},{"w":"layer","p":"leɪər","c":"层","cat":"计算机网络","s":3},{"w":"encapsulation","p":"ɪnˌkæpsəˈleɪʃən","c":"封装","cat":"计算机网络","s":3},{"w":"packet","p":"ˈpækɪt","c":"分组、包","cat":"计算机网络","s":3},{"w":"frame","p":"freɪm","c":"帧","cat":"计算机网络","s":3},{"w":"datagram","p":"ˈdeɪtəˌgræm","c":"数据报","cat":"计算机网络","s":2},{"w":"routing","p":"ˈrutɪŋ","c":"路由","cat":"计算机网络","s":3},{"w":"router","p":"ˈrutər","c":"路由器","cat":"计算机网络","s":3},{"w":"switch","p":"swɪʧ","c":"交换机","cat":"计算机网络","s":3},{"w":"gateway","p":"ˈgeɪtˌweɪ","c":"网关","cat":"计算机网络","s":3},{"w":"subnet mask","p":"ˈsʌbˌnɛt mæsk","c":"子网掩码","cat":"计算机网络","s":3},{"w":"IP address","p":"ˌaɪˌpi ˈæˌdrɛs","c":"IP 地址","cat":"计算机网络","s":3},{"w":"port","p":"pɔrt","c":"端口","cat":"计算机网络","s":3},{"w":"socket","p":"ˈsɑkət","c":"套接字","cat":"计算机网络","s":2},{"w":"handshake","p":"ˈhændˌʃeɪk","c":"握手","cat":"计算机网络","s":3},{"w":"congestion control","p":"kənˈʤɛsʧən kənˈtroʊl","c":"拥塞控制","cat":"计算机网络","s":2},{"w":"flow control","p":"floʊ kənˈtroʊl","c":"流量控制","cat":"计算机网络","s":3},{"w":"bandwidth","p":"ˈbændwɪdθ","c":"带宽","cat":"计算机网络","s":3},{"w":"latency","p":"ˈleɪtənsi","c":"时延","cat":"计算机网络","s":2},{"w":"topology","p":"təˈpɔləʤi","c":"拓扑结构","cat":"计算机网络","s":2},{"w":"star topology","p":"stɑr təˈpɔləʤi","c":"星型拓扑","cat":"计算机网络","s":2},{"w":"Ethernet","p":"ˈiθərˌnɛt","c":"以太网","cat":"计算机网络","s":3},{"w":"fiber","p":"ˈfaɪbər","c":"光纤","cat":"计算机网络","s":2},{"w":"wireless","p":"ˈwaɪrlɪs","c":"无线","cat":"计算机网络","s":2},{"w":"firewall","p":"ˈfaɪrwɑl","c":"防火墙","cat":"计算机网络","s":3},{"w":"proxy","p":"ˈprɑksi","c":"代理","cat":"计算机网络","s":2},{"w":"load balancing","p":"loʊd ˈbælənsɪŋ","c":"负载均衡","cat":"计算机网络","s":2},{"w":"domain name","p":"doʊˈmeɪn neɪm","c":"域名","cat":"计算机网络","s":3},{"w":"resolution","p":"ˌrɛzəˈluʃən","c":"解析","cat":"计算机网络","s":2},{"w":"HTTP","p":"ˌeɪtʃ ti ti ˈpi","c":"超文本传输协议","cat":"计算机网络","s":3},{"w":"FTP","p":"ˌɛf ti ˈpi","c":"文件传输协议","cat":"计算机网络","s":3},{"w":"SMTP","p":"ˌɛs ɛm ti ˈpi","c":"简单邮件传输协议","cat":"计算机网络","s":3},{"w":"POP3","p":"ˌpi oʊ ˈpi θri","c":"邮局协议第 3 版","cat":"计算机网络","s":2},{"w":"SNMP","p":"ˌɛs ɛn ɛm ˈpi","c":"简单网络管理协议","cat":"计算机网络","s":2},{"w":"ARP","p":"ɑrp","c":"地址解析协议","cat":"计算机网络","s":2},{"w":"ICMP","p":"ˌaɪ si ɛm ˈpi","c":"网际控制报文协议","cat":"计算机网络","s":2},{"w":"virtual private network","p":"ˈvərʧuəl ˈpraɪvət ˈnɛtˌwərk","c":"虚拟专用网","cat":"计算机网络","s":2},{"w":"virtual LAN","p":"ˈvərʧuəl læn","c":"虚拟局域网","cat":"计算机网络","s":2},{"w":"broadband","p":"ˈbrɔdˌbænd","c":"宽带","cat":"计算机网络","s":2},{"w":"requirement","p":"rɪkˈwaɪrmənt","c":"需求","cat":"软件工程","s":3},{"w":"functional requirement","p":"ˈfəŋkʃənəl rɪkˈwaɪrmənt","c":"功能需求","cat":"软件工程","s":3},{"w":"non-functional requirement","p":"nɑn ˈfəŋkʃənəl rɪkˈwaɪrmənt","c":"非功能需求","cat":"软件工程","s":3},{"w":"feasibility study","p":"ˌfizəˈbɪləti ˈstədi","c":"可行性研究","cat":"软件工程","s":3},{"w":"waterfall model","p":"ˈwɔtərˌfɔl ˈmɑdəl","c":"瀑布模型","cat":"软件工程","s":3},{"w":"spiral model","p":"ˈspaɪrəl ˈmɑdəl","c":"螺旋模型","cat":"软件工程","s":3},{"w":"incremental","p":"ˌɪnkrəˈmɛntəl","c":"增量的","cat":"软件工程","s":3},{"w":"iterative","p":"ˈɪtərˌeɪtɪv","c":"迭代的","cat":"软件工程","s":3},{"w":"prototype","p":"ˈproʊtoʊˌtaɪp","c":"原型","cat":"软件工程","s":3},{"w":"agile","p":"ˈæʤəl","c":"敏捷的","cat":"软件工程","s":3},{"w":"use case","p":"juz keɪs","c":"用例","cat":"软件工程","s":3},{"w":"actor","p":"ˈæktər","c":"参与者","cat":"软件工程","s":3},{"w":"data flow diagram","p":"ˈdætə floʊ ˈdaɪəˌgræm","c":"数据流图","cat":"软件工程","s":3},{"w":"data dictionary","p":"ˈdætə ˈdɪkʃəˌnɛri","c":"数据字典","cat":"软件工程","s":3},{"w":"entity-relationship diagram","p":"ˈɛntɪti riˈleɪʃənˌʃɪp ˈdaɪəˌgræm","c":"实体联系图","cat":"软件工程","s":3},{"w":"cohesion","p":"koʊˈhiʒən","c":"内聚","cat":"软件工程","s":3},{"w":"coupling","p":"ˈkəplɪŋ","c":"耦合","cat":"软件工程","s":3},{"w":"module","p":"ˈmɑʤul","c":"模块","cat":"软件工程","s":3},{"w":"abstraction","p":"æbˈstrækʃən","c":"抽象","cat":"软件工程","s":2},{"w":"information hiding","p":"ˌɪnˌfɔrˈmeɪʃən ˈhaɪdɪŋ","c":"信息隐藏","cat":"软件工程","s":2},{"w":"refactoring","p":"riˈfæktərɪŋ","c":"重构","cat":"软件工程","s":3},{"w":"unit testing","p":"ˈjunɪt ˈtɛstɪŋ","c":"单元测试","cat":"软件工程","s":3},{"w":"integration testing","p":"ˌɪnəˈgreɪʃən ˈtɛstɪŋ","c":"集成测试","cat":"软件工程","s":3},{"w":"system testing","p":"ˈsɪstəm ˈtɛstɪŋ","c":"系统测试","cat":"软件工程","s":3},{"w":"regression testing","p":"rəˈgrɛʃən ˈtɛstɪŋ","c":"回归测试","cat":"软件工程","s":3},{"w":"black-box testing","p":"blæk bɑks ˈtɛstɪŋ","c":"黑盒测试","cat":"软件工程","s":3},{"w":"white-box testing","p":"waɪt bɑks ˈtɛstɪŋ","c":"白盒测试","cat":"软件工程","s":3},{"w":"code coverage","p":"koʊd ˈkəvərɪʤ","c":"代码覆盖率","cat":"软件工程","s":2},{"w":"defect","p":"ˈdifɛkt","c":"缺陷","cat":"软件工程","s":2},{"w":"version control","p":"ˈvərʒən kənˈtroʊl","c":"版本控制","cat":"软件工程","s":2},{"w":"configuration management","p":"kənˌfɪgjərˈeɪʃən ˈmænɪʤmənt","c":"配置管理","cat":"软件工程","s":3},{"w":"baseline","p":"ˈbeɪsˌlaɪn","c":"基线","cat":"软件工程","s":2},{"w":"milestone","p":"ˈmaɪlˌstoʊn","c":"里程碑","cat":"软件工程","s":2},{"w":"deliverable","p":"dɪˈlɪvərəbəl","c":"交付物","cat":"软件工程","s":2},{"w":"risk management","p":"rɪsk ˈmænɪʤmənt","c":"风险管理","cat":"软件工程","s":2},{"w":"Gantt chart","p":"gænt ʧɑrt","c":"甘特图","cat":"软件工程","s":3},{"w":"critical path","p":"ˈkrɪtɪkəl pæθ","c":"关键路径","cat":"软件工程","s":3},{"w":"effort estimation","p":"ˈɛfərt ˌɛstəˈmeɪʃən","c":"工作量估算","cat":"软件工程","s":2},{"w":"maintainability","p":"meɪnˌteɪnəˈbɪləti","c":"可维护性","cat":"软件工程","s":3},{"w":"portability","p":"ˌpɔrtəˈbɪlɪti","c":"可移植性","cat":"软件工程","s":3},{"w":"scalability","p":"ˌskeɪləˈbɪləti","c":"可扩展性","cat":"软件工程","s":2},{"w":"availability","p":"əˌveɪləˈbɪlɪti","c":"可用性","cat":"软件工程","s":3},{"w":"quality assurance","p":"kˈwɑləti əˈʃʊrəns","c":"质量保证","cat":"软件工程","s":3},{"w":"corrective maintenance","p":"kərˈɛktɪv ˈmeɪntənəns","c":"改正性维护","cat":"软件工程","s":2},{"w":"adaptive maintenance","p":"əˈdæptɪv ˈmeɪntənəns","c":"适应性维护","cat":"软件工程","s":2},{"w":"perfective maintenance","p":"pərˈfɛktɪv ˈmeɪntənəns","c":"改善性维护","cat":"软件工程","s":2},{"w":"class","p":"klæs","c":"类","cat":"面向对象与 UML","s":3},{"w":"object","p":"ˈɑbʤɛkt","c":"对象","cat":"面向对象与 UML","s":3},{"w":"instance","p":"ˈɪnstəns","c":"实例","cat":"面向对象与 UML","s":3},{"w":"inheritance","p":"ˌɪnˈhɛrətəns","c":"继承","cat":"面向对象与 UML","s":3},{"w":"generalization","p":"ˌʤɛnərəlɪˈzeɪʃən","c":"泛化","cat":"面向对象与 UML","s":3},{"w":"specialization","p":"ˌspɛʃələˈzeɪʃən","c":"特化","cat":"面向对象与 UML","s":2},{"w":"association","p":"əˌsoʊʃiˈeɪʃən","c":"关联","cat":"面向对象与 UML","s":3},{"w":"aggregation","p":"ˌægrəˈgeɪʃən","c":"聚合","cat":"面向对象与 UML","s":3},{"w":"composition","p":"ˌkɑmpəˈzɪʃən","c":"组合","cat":"面向对象与 UML","s":3},{"w":"dependency","p":"dɪˈpɛndənsi","c":"依赖","cat":"面向对象与 UML","s":3},{"w":"realization","p":"ˈriləˈzeɪʃən","c":"实现","cat":"面向对象与 UML","s":2},{"w":"interface","p":"ˈɪnərˌfeɪs","c":"接口","cat":"面向对象与 UML","s":3},{"w":"abstract class","p":"ˈæbˌstrækt klæs","c":"抽象类","cat":"面向对象与 UML","s":3},{"w":"polymorphism","p":"ˌpɑˌliˈmɔrfɪzm","c":"多态","cat":"面向对象与 UML","s":3},{"w":"overriding","p":"ˈoʊvərˌraɪdɪŋ","c":"重写、覆盖","cat":"面向对象与 UML","s":3},{"w":"overloading","p":"ˈoʊvərˌloʊdɪŋ","c":"重载","cat":"面向对象与 UML","s":3},{"w":"message","p":"ˈmɛsɪʤ","c":"消息","cat":"面向对象与 UML","s":2},{"w":"multiplicity","p":"ˌməltəˈplɪsɪti","c":"多重度","cat":"面向对象与 UML","s":3},{"w":"use case diagram","p":"juz keɪs ˈdaɪəˌgræm","c":"用例图","cat":"面向对象与 UML","s":3},{"w":"class diagram","p":"klæs ˈdaɪəˌgræm","c":"类图","cat":"面向对象与 UML","s":3},{"w":"sequence diagram","p":"ˈsikwəns ˈdaɪəˌgræm","c":"顺序图","cat":"面向对象与 UML","s":3},{"w":"collaboration diagram","p":"kəˌlæbərˈeɪʃən ˈdaɪəˌgræm","c":"协作图","cat":"面向对象与 UML","s":2},{"w":"statechart diagram","p":"ˈsteɪtˌtʃɑrt ˈdaɪəˌgræm","c":"状态图","cat":"面向对象与 UML","s":3},{"w":"activity diagram","p":"ækˈtɪvɪti ˈdaɪəˌgræm","c":"活动图","cat":"面向对象与 UML","s":3},{"w":"component diagram","p":"kəmˈpoʊnənt ˈdaɪəˌgræm","c":"构件图","cat":"面向对象与 UML","s":2},{"w":"deployment diagram","p":"dɪˈplɔɪmənt ˈdaɪəˌgræm","c":"部署图","cat":"面向对象与 UML","s":2},{"w":"design pattern","p":"dɪˈzaɪn ˈpætərn","c":"设计模式","cat":"面向对象与 UML","s":3},{"w":"singleton","p":"ˈsɪŋgəltən","c":"单例模式","cat":"面向对象与 UML","s":3},{"w":"factory method","p":"ˈfæktəri ˈmɛθəd","c":"工厂方法模式","cat":"面向对象与 UML","s":3},{"w":"observer","p":"əbˈzərvər","c":"观察者模式","cat":"面向对象与 UML","s":3},{"w":"adapter","p":"əˈdæptər","c":"适配器模式","cat":"面向对象与 UML","s":3},{"w":"strategy","p":"ˈstrætəʤi","c":"策略模式","cat":"面向对象与 UML","s":2},{"w":"template method","p":"ˈtɛmplət ˈmɛθəd","c":"模板方法模式","cat":"面向对象与 UML","s":2},{"w":"decorator","p":"ˈdɛkərˌeɪtər","c":"装饰器模式","cat":"面向对象与 UML","s":2},{"w":"encryption","p":"ɛnˈkrɪpʃən","c":"加密","cat":"信息安全","s":3},{"w":"decryption","p":"diˈkrɪpʃən","c":"解密","cat":"信息安全","s":3},{"w":"symmetric encryption","p":"sɪˈmɛtrɪk ɪnˈkrɪpʃən","c":"对称加密","cat":"信息安全","s":3},{"w":"asymmetric encryption","p":"ˌeɪsɪˈmɛtrɪk ɪnˈkrɪpʃən","c":"非对称加密","cat":"信息安全","s":3},{"w":"public key","p":"ˈpəblɪk ki","c":"公钥","cat":"信息安全","s":3},{"w":"private key","p":"ˈpraɪvət ki","c":"私钥","cat":"信息安全","s":3},{"w":"digital signature","p":"ˈdɪʤɪtəl ˈsɪgnəʧər","c":"数字签名","cat":"信息安全","s":3},{"w":"digital certificate","p":"ˈdɪʤɪtəl sərˈtɪfɪkət","c":"数字证书","cat":"信息安全","s":3},{"w":"hash function","p":"hæʃ ˈfəŋkʃən","c":"散列函数","cat":"信息安全","s":3},{"w":"authentication","p":"ɔˌθɛntəˈkeɪʃən","c":"认证","cat":"信息安全","s":3},{"w":"authorization","p":"ˌɔθərəˈzeɪʃən","c":"授权","cat":"信息安全","s":3},{"w":"access control","p":"ˈækˌsɛs kənˈtroʊl","c":"访问控制","cat":"信息安全","s":3},{"w":"intrusion detection","p":"ˌɪnˈtruʒən dɪˈtɛkʃən","c":"入侵检测","cat":"信息安全","s":2},{"w":"virus","p":"ˈvaɪrəs","c":"病毒","cat":"信息安全","s":2},{"w":"worm","p":"wərm","c":"蠕虫","cat":"信息安全","s":2},{"w":"trojan horse","p":"ˈtroʊʤən hɔrs","c":"特洛伊木马","cat":"信息安全","s":2},{"w":"phishing","p":"ˈfɪʃɪŋ","c":"网络钓鱼","cat":"信息安全","s":2},{"w":"vulnerability","p":"ˌvəlnərəˈbɪlɪti","c":"漏洞","cat":"信息安全","s":3},{"w":"patch","p":"pæʧ","c":"补丁","cat":"信息安全","s":2},{"w":"confidentiality","p":"ˌkɑnfəˌdɛnʃiˈæləti","c":"机密性","cat":"信息安全","s":3},{"w":"integrity","p":"ˌɪnˈtɛgrəti","c":"完整性","cat":"信息安全","s":3},{"w":"least privilege","p":"list ˈprɪvɪlɪʤ","c":"最小权限原则","cat":"信息安全","s":2},{"w":"audit trail","p":"ˈɔdɪt treɪl","c":"审计跟踪","cat":"信息安全","s":2},{"w":"ransomware","p":"ˈrænsəmˌwɛr","c":"勒索软件","cat":"信息安全","s":1},{"w":"denial of service","p":"dɪˈnaɪəl əv ˈsərvɪs","c":"拒绝服务","cat":"信息安全","s":2},{"w":"approximately","p":"əˈprɑksəmətli","c":"大约","cat":"常用学术词汇","s":2},{"w":"arbitrary","p":"ˈɑrbɪˌtrɛri","c":"任意的","cat":"常用学术词汇","s":1},{"w":"assume","p":"əˈsum","c":"假定","cat":"常用学术词汇","s":2},{"w":"comprise","p":"kəmˈpraɪz","c":"包含、由……组成","cat":"常用学术词汇","s":2},{"w":"consist of","p":"kənˈsɪst əv","c":"由……组成","cat":"常用学术词汇","s":2},{"w":"derive","p":"dəraɪv","c":"推导、派生","cat":"常用学术词汇","s":2},{"w":"determine","p":"dɪˈtərmən","c":"确定","cat":"常用学术词汇","s":3},{"w":"ensure","p":"ɪnˈʃʊr","c":"确保","cat":"常用学术词汇","s":3},{"w":"evaluate","p":"ɪˈvæljuˌeɪt","c":"评估","cat":"常用学术词汇","s":2},{"w":"exceed","p":"ɪkˈsid","c":"超过","cat":"常用学术词汇","s":2},{"w":"facilitate","p":"fəˈsɪləˌteɪt","c":"促进、使便利","cat":"常用学术词汇","s":2},{"w":"implement","p":"ˈɪmpləmənt","c":"实现","cat":"常用学术词汇","s":3},{"w":"indicate","p":"ˈɪndəˌkeɪt","c":"表明","cat":"常用学术词汇","s":2},{"w":"infer","p":"ˌɪnˈfər","c":"推断","cat":"常用学术词汇","s":2},{"w":"maintain","p":"meɪnˈteɪn","c":"维护","cat":"常用学术词汇","s":3},{"w":"obtain","p":"əbˈteɪn","c":"获得","cat":"常用学术词汇","s":2},{"w":"perform","p":"pərˈfɔrm","c":"执行","cat":"常用学术词汇","s":2},{"w":"prefer","p":"prɪˈfər","c":"偏好","cat":"常用学术词汇","s":1},{"w":"propose","p":"prəˈpoʊz","c":"提出","cat":"常用学术词汇","s":2},{"w":"require","p":"ˌrikˈwaɪər","c":"要求","cat":"常用学术词汇","s":3},{"w":"restrict","p":"riˈstrɪkt","c":"限制","cat":"常用学术词汇","s":2},{"w":"satisfy","p":"ˈsætɪsˌfaɪ","c":"满足","cat":"常用学术词汇","s":2},{"w":"specify","p":"ˈspɛsəˌfaɪ","c":"明确指定","cat":"常用学术词汇","s":2},{"w":"subsequent","p":"ˈsəbsəkwənt","c":"随后的","cat":"常用学术词汇","s":1},{"w":"sufficient","p":"səˈfɪʃənt","c":"充分的","cat":"常用学术词汇","s":2},{"w":"thereby","p":"ˈðɛrˈbaɪ","c":"从而","cat":"常用学术词汇","s":1},{"w":"whereas","p":"wɛˈræz","c":"然而","cat":"常用学术词汇","s":1},{"w":"yield","p":"jild","c":"产生、得出","cat":"常用学术词汇","s":2},{"w":"feasible","p":"ˈfizəbəl","c":"可行的","cat":"常用学术词汇","s":2},{"w":"redundant","p":"rɪˈdəndənt","c":"冗余的","cat":"常用学术词汇","s":2},{"w":"CPU","p":"ˌsi pi ˈju","c":"中央处理器（Central Processing Unit）","cat":"常见缩写","s":3},{"w":"ALU","p":"ˈɑlu","c":"算术逻辑单元","cat":"常见缩写","s":3},{"w":"RAM","p":"ræm","c":"随机存取存储器","cat":"常见缩写","s":3},{"w":"ROM","p":"rɑm","c":"只读存储器","cat":"常见缩写","s":3},{"w":"I/O","p":"ˌaɪ ˈoʊ","c":"输入/输出","cat":"常见缩写","s":3},{"w":"OS","p":"ɑs","c":"操作系统","cat":"常见缩写","s":3},{"w":"DBMS","p":"ˌdi bi ɛm ˈɛs","c":"数据库管理系统","cat":"常见缩写","s":3},{"w":"SQL","p":"ˌɛs kju ˈɛl","c":"结构化查询语言","cat":"常见缩写","s":3},{"w":"DDL","p":"ˌdi di ˈɛl","c":"数据定义语言","cat":"常见缩写","s":3},{"w":"DML","p":"ˌdi ɛm ˈɛl","c":"数据操纵语言","cat":"常见缩写","s":3},{"w":"LAN","p":"læn","c":"局域网","cat":"常见缩写","s":3},{"w":"WAN","p":"wɑn","c":"广域网","cat":"常见缩写","s":3},{"w":"TCP","p":"ˌti si ˈpi","c":"传输控制协议","cat":"常见缩写","s":3},{"w":"UDP","p":"ˌju di ˈpi","c":"用户数据报协议","cat":"常见缩写","s":3},{"w":"HTTP","p":"ˌeɪtʃ ti ti ˈpi","c":"超文本传输协议","cat":"常见缩写","s":3},{"w":"URL","p":"ˌju ɑr ˈɛl","c":"统一资源定位符","cat":"常见缩写","s":3},{"w":"DNS","p":"ˌdi ɛn ˈɛs","c":"域名系统","cat":"常见缩写","s":3},{"w":"API","p":"ˌeɪ pi ˈaɪ","c":"应用程序编程接口","cat":"常见缩写","s":3},{"w":"IDE","p":"aɪd","c":"集成开发环境","cat":"常见缩写","s":2},{"w":"UML","p":"ˌju ɛm ˈɛl","c":"统一建模语言","cat":"常见缩写","s":3},{"w":"OOP","p":"up","c":"面向对象编程","cat":"常见缩写","s":3},{"w":"GUI","p":"ˈɡui","c":"图形用户界面","cat":"常见缩写","s":2},{"w":"CLI","p":"ˌsi ɛl ˈaɪ","c":"命令行界面","cat":"常见缩写","s":1},{"w":"RAID","p":"reɪd","c":"独立磁盘冗余阵列","cat":"常见缩写","s":2},{"w":"SSD","p":"ˌɛs ɛs ˈdi","c":"固态硬盘","cat":"常见缩写","s":2},{"w":"BIOS","p":"baɪoʊs","c":"基本输入输出系统","cat":"常见缩写","s":2},{"w":"DFD","p":"ˌdi ɛf ˈdi","c":"数据流图","cat":"常见缩写","s":3},{"w":"ER","p":"ər","c":"实体联系","cat":"常见缩写","s":3},{"w":"SLA","p":"ˌɛs ɛl ˈeɪ","c":"服务等级协议","cat":"常见缩写","s":1}];
+
+/* ================= 常量 ================= */
+var KEY = 'ruankao_checkin_v2';
+var HABITS = [
+  {key:'study',    name:'学习', color:'#2f9e5b'},
+  {key:'exercise', name:'锻炼', color:'#c9882b'},
+  {key:'english',  name:'英语', color:'#3b6fb6'}
+];
+var DEFAULTS = { start:'2026-11-19', end:'2027-05-22', exam:'2027-05-22',
+                 signup:['2027-02-20','2027-03-31'], sprint:'2027-05-17',
+                 dailyWords:10, token:'', gist:'' };
+
+/* ================= 日期工具 ================= */
+function parseYmd(s){ var p = String(s).split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+function ymd(d){ var m=d.getMonth()+1, day=d.getDate();
+  return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(day<10?'0':'')+day; }
+function addDays(d,n){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()+n); }
+function todayStr(){ return ymd(new Date()); }
+function daysBetween(a,b){ return Math.round((parseYmd(b)-parseYmd(a))/86400000); }
+function weekdayCN(s){ return '日一二三四五六'[parseYmd(s).getDay()]; }
+function eachDay(start,end){ var out=[], d=parseYmd(start), last=parseYmd(end);
+  while(d<=last){ out.push(ymd(d)); d=addDays(d,1); } return out; }
+function weekNo(dateStr,startStr){ var n=Math.floor(daysBetween(startStr,dateStr)/7); return n<0?1:n+1; }
+function isYmd(s){ return typeof s==='string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(parseYmd(s)); }
+
+/* ================= 状态 ================= */
+var state = { records:{}, vocab:{}, wrong:{}, cfg: Object.assign({}, DEFAULTS) };
+
+function sanitizeCfg(o){
+  var c = Object.assign({}, DEFAULTS, o||{});
+  ['start','end','exam'].forEach(function(k){ if(!isYmd(c[k])) c[k]=DEFAULTS[k]; });
+  if (!Array.isArray(c.signup)||c.signup.length!==2||!isYmd(c.signup[0])||!isYmd(c.signup[1]))
+    c.signup = DEFAULTS.signup.slice();
+  if (!isYmd(c.sprint)) c.sprint = DEFAULTS.sprint;
+  if (c.start >= c.end) c.start = DEFAULTS.start;
+  c.dailyWords = [5,10,15,20].indexOf(+c.dailyWords) >= 0 ? +c.dailyWords : 10;
+  c.token = typeof c.token === 'string' ? c.token : '';
+  c.gist = typeof c.gist === 'string' ? c.gist : '';
+  return c;
+}
+
+function load(){
+  try{
+    var raw = localStorage.getItem(KEY) || localStorage.getItem('ruankao_checkin_v1');
+    if (!raw) return;
+    var o = JSON.parse(raw);
+    if (o && o.records) state.records = o.records;
+    if (o && o.vocab) state.vocab = o.vocab;
+    if (o && o.wrong) state.wrong = o.wrong;
+    if (o && o.cfg) state.cfg = sanitizeCfg(o.cfg);
+  }catch(e){ console.warn('读取本地数据失败', e); }
+}
+function persist(){
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); }
+  catch(e){ alert('保存失败，可能是浏览器隐私模式或空间不足。'); }
+}
+
+/* ================= 打卡逻辑 ================= */
+function markOf(records,dateStr,key){ var r=records[dateStr]; return (r&&r[key])||null; }
+function currentStreak(records,key,today,startStr){
+  var d=parseYmd(today), n=0, tm=markOf(records,today,key);
+  if (tm==='no') return 0;
+  if (tm!=='yes') d=addDays(d,-1);
+  while (ymd(d)>=startStr && markOf(records,ymd(d),key)==='yes'){ n++; d=addDays(d,-1); }
+  return n;
+}
+function maxStreak(records,key,startStr,endStr){
+  var best=0, run=0;
+  eachDay(startStr,endStr).forEach(function(ds){
+    if (markOf(records,ds,key)==='yes'){ run++; if(run>best) best=run; } else run=0;
+  });
+  return best;
+}
+function countYes(records,key,startStr,endStr){
+  var n=0; eachDay(startStr,endStr).forEach(function(ds){ if(markOf(records,ds,key)==='yes') n++; }); return n;
+}
+function dayScore(records,dateStr){
+  var n=0, bad=false;
+  HABITS.forEach(function(h){ var m=markOf(records,dateStr,h.key);
+    if(m==='yes') n++; if(m==='no') bad=true; });
+  return {n:n, bad:bad};
+}
+function weekSummary(records,today,startStr){
+  var d=parseYmd(today), off=(d.getDay()+6)%7, mon=addDays(d,-off), done=0;
+  for(var i=0;i<7;i++){ var ds=ymd(addDays(mon,i));
+    if(ds<startStr) continue;
+    HABITS.forEach(function(h){ if(markOf(records,ds,h.key)==='yes') done++; }); }
+  return done;
+}
+function setMark(dateStr,key,val){
+  var r = state.records[dateStr] || {};
+  if (val===null) delete r[key]; else r[key]=val;
+  var empty = Object.keys(r).filter(function(k){return k!=='note';}).length===0 && !r.note;
+  if (empty) delete state.records[dateStr]; else state.records[dateStr]=r;
+  afterChange();
+}
+
+/* ================= 单词学习逻辑 ================= */
+function wordKey(w){ return w.toLowerCase().trim(); }
+function vstat(w){ return state.vocab[wordKey(w)] || {seen:0,right:0,wrong:0,streak:0,mastered:false,last:0}; }
+function setVstat(w, patch){
+  var k = wordKey(w), s = Object.assign({seen:0,right:0,wrong:0,streak:0,mastered:false,last:0}, state.vocab[k]||{}, patch);
+  state.vocab[k] = s;
+}
+function studiedCount(){
+  return Object.keys(state.vocab).filter(function(k){ return state.vocab[k].seen>0; }).length;
+}
+function masteredCount(){
+  return Object.keys(state.vocab).filter(function(k){ return state.vocab[k].mastered; }).length;
+}
+function wrongList(){
+  return Object.keys(state.wrong).map(function(k){ return {key:k, info:state.wrong[k]}; })
+    .sort(function(a,b){ return (b.info.count||0)-(a.info.count||0); });
+}
+
+/* 今日该学的词：优先错题本 → 没学过的 → 学过但没掌握的 */
+function pickTodayWords(n){
+  var byKey = {}; VOCAB.forEach(function(v){ byKey[wordKey(v.w)] = v; });
+  var picked = [], used = {};
+  wrongList().forEach(function(x){
+    if (picked.length>=n) return;
+    var v = byKey[x.key]; if (v && !used[x.key]){ picked.push(v); used[x.key]=1; }
+  });
+  VOCAB.forEach(function(v){
+    if (picked.length>=n) return;
+    var k = wordKey(v.w), s = state.vocab[k];
+    if (!used[k] && (!s || s.seen===0)){ picked.push(v); used[k]=1; }
+  });
+  VOCAB.forEach(function(v){
+    if (picked.length>=n) return;
+    var k = wordKey(v.w), s = state.vocab[k];
+    if (!used[k] && s && !s.mastered){ picked.push(v); used[k]=1; }
+  });
+  return picked;
+}
+function wordsLearnedToday(){
+  var t = todayStr(), n = 0;
+  Object.keys(state.vocab).forEach(function(k){
+    var s = state.vocab[k];
+    if (s.last && ymd(new Date(s.last)) === t) n++;
+  });
+  return n;
+}
+
+/* 挖空：随机把 1–3 个字母换成 _（不动首字母，短语按整串处理） */
+function maskWord(word, rnd){
+  var chars = word.split('');
+  var idx = [];
+  for (var i=1;i<chars.length;i++){ if (/[a-zA-Z]/.test(chars[i])) idx.push(i); }
+  if (!idx.length) return word.replace(/./g, '_');
+  var k = Math.min(3, Math.max(1, Math.round(idx.length*0.35)));
+  var picked = [];
+  for (var j=0;j<k && idx.length;j++){
+    var p = Math.floor((rnd ? rnd() : Math.random()) * idx.length);
+    picked.push(idx.splice(p,1)[0]);
+  }
+  picked.sort(function(a,b){return a-b;});
+  var out = '', last = 0;
+  picked.forEach(function(p){ out += chars.slice(last,p).join('') + '_'; last = p+1; });
+  out += chars.slice(last).join('');
+  return out;
+}
+function normalizeAnswer(s){
+  return String(s).toLowerCase().replace(/[’']/g,"'").replace(/\s+/g,' ').trim();
+}
+
+/* ================= 渲染：打卡 ================= */
+function $(id){ return document.getElementById(id); }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+function render(){
+  var today = todayStr(), start = state.cfg.start, end = state.cfg.end;
+  var left = daysBetween(today, state.cfg.exam);
+  var totalWeeks = Math.ceil(daysBetween(start,end)/7);
+  $('subline').textContent = start+' → '+end+'　共 '+(daysBetween(start,end)+1)+' 天 / '+totalWeeks+' 周';
+
+  var counts = [];
+  if (left>0) counts.push('<span class="pill">距考试 '+left+' 天</span>');
+  else if (left===0) counts.push('<span class="pill hot">今天就是考试日</span>');
+  else counts.push('<span class="pill">考试已过 '+(-left)+' 天</span>');
+  if (today>=state.cfg.signup[0] && today<=state.cfg.signup[1])
+    counts.push('<span class="pill warn">报名期，别错过缴费</span>');
+  if (today>=state.cfg.sprint) counts.push('<span class="pill hot">考前冲刺</span>');
+  var totalYes = 0;
+  HABITS.forEach(function(h){ totalYes += countYes(state.records,h.key,start,end); });
+  counts.push('<span class="pill">累计打勾 '+totalYes+' 次</span>');
+  counts.push('<span class="pill" id="syncChip">—</span>');
+  $('counts').innerHTML = counts.join('');
+  syncChip();
+
+  $('todayDate').textContent = today;
+  $('todayWeek').textContent = '星期'+weekdayCN(today)+' · W'+weekNo(today,start);
+  $('weekProgress').innerHTML = '本周 <b>'+weekSummary(state.records,today,start)+'</b> / 21';
+
+  var rows = '';
+  HABITS.forEach(function(h){
+    var m = markOf(state.records,today,h.key);
+    var cs = currentStreak(state.records,h.key,today,start);
+    rows += '<div class="habit"><span class="dot" style="background:'+h.color+'"></span>'+
+      '<span class="hname">'+h.name+'</span><span class="streak">连续 <b>'+cs+'</b> 天</span>'+
+      '<span class="spacer"></span><div class="btns">'+
+      '<button class="btn'+(m==='yes'?' on-yes':'')+'" data-k="'+h.key+'" data-v="yes">✓ 完成</button>'+
+      '<button class="btn'+(m==='no'?' on-no':'')+'" data-k="'+h.key+'" data-v="no">✗ 断了</button>'+
+      '</div></div>';
+  });
+  $('habitRows').innerHTML = rows;
+  Array.prototype.forEach.call($('habitRows').querySelectorAll('button'), function(b){
+    b.onclick = function(){
+      var k=b.dataset.k, v=b.dataset.v, cur=markOf(state.records,today,k);
+      setMark(today,k,cur===v?null:v);
+    };
+  });
+  var rec = state.records[today]||{};
+  $('noteInput').value = rec.note||'';
+
+  var st = '';
+  HABITS.forEach(function(h){
+    var cs = currentStreak(state.records,h.key,today,start);
+    var ms = maxStreak(state.records,h.key,start,end);
+    var cy = countYes(state.records,h.key,start,end);
+    st += '<div class="stat"><div class="t"><span class="dot" style="background:'+h.color+'"></span>'+h.name+'</div>'+
+      '<div class="n">'+cs+'<span>天</span></div><div class="m">最长 '+ms+' 天 · 共 '+cy+' 次</div></div>';
+  });
+  $('statsRow').innerHTML = st;
+
+  renderHeat(today,start,end);
+  renderRecent(today,start);
+  renderWords();
+  renderWrong();
+}
+
+function renderHeat(today,start,end){
+  var d0=parseYmd(start), first=addDays(d0,-((d0.getDay()+6)%7)), last=parseYmd(end);
+  var cols = Math.ceil(((last-first)/86400000+1)/7);
+  var head='<tr><th></th>';
+  for(var c=0;c<cols;c++) head += '<th>'+(c%4===0?(c+1):'')+'</th>';
+  head+='</tr>';
+  var dayNames=['一','二','三','四','五','六','日'], body='';
+  for(var r=0;r<7;r++){
+    body += '<tr><td class="rowlab">'+(r%2===0?dayNames[r]:'')+'</td>';
+    for(var c2=0;c2<cols;c2++){
+      var dt=addDays(first,c2*7+r), ds=ymd(dt);
+      if(dt<d0||dt>last){ body+='<td><div class="cell off"></div></td>'; continue; }
+      var sc=dayScore(state.records,ds), future=ds>today;
+      var cls='cell'+(sc.n?' l'+sc.n:'')+(sc.bad?' bad':'')+(ds===today?' today':'')+(future?' future':'');
+      body+='<td><div class="'+cls+'" data-d="'+ds+'" title="'+ds+' 星期'+weekdayCN(ds)+'　'+sc.n+'/3'+
+            (sc.bad?'（有断签）':'')+(future?'（还没到）':'')+'"></div></td>';
+    }
+    body+='</tr>';
+  }
+  $('heat').innerHTML='<table>'+head+body+'</table>';
+  Array.prototype.forEach.call($('heat').querySelectorAll('.cell[data-d]'), function(cell){
+    if (cell.classList.contains('future')) return;
+    cell.onclick = function(){ editDay(cell.dataset.d); };
+  });
+}
+function editDay(ds){
+  var cur = dayScore(state.records,ds).n;
+  if (cur===0) HABITS.forEach(function(h){ setMark(ds,h.key,'yes'); });
+  else HABITS.forEach(function(h){ setMark(ds,h.key,null); });
+}
+function renderRecent(today,start){
+  var out='', d=parseYmd(today);
+  for(var i=0;i<14;i++){
+    var ds=ymd(addDays(d,-i)); if(ds<start) break;
+    var rec=state.records[ds]||{};
+    var marks=HABITS.map(function(h){
+      var m=markOf(state.records,ds,h.key);
+      return '<span class="mk '+(m==='yes'?'y':(m==='no'?'n':'e'))+'" title="'+h.name+'">'+
+             (m==='yes'?'✓':(m==='no'?'✗':'·'))+'</span>';
+    }).join('');
+    out += '<li><span class="dt">'+ds.slice(5)+'</span><span class="wd">周'+weekdayCN(ds)+'</span>'+
+           '<span class="marks">'+marks+'</span><span class="nt">'+escapeHtml(rec.note||'')+'</span></li>';
+  }
+  $('recent').innerHTML = out;
+}
+
+/* ================= 渲染：单词 ================= */
+function renderWords(){
+  Array.prototype.forEach.call($('dailySeg').querySelectorAll('button'), function(b){
+    b.className = (+b.dataset.n === state.cfg.dailyWords) ? 'on' : '';
+    b.onclick = function(){ state.cfg.dailyWords = +b.dataset.n; afterChange(); };
+  });
+  $('kStudied').textContent = studiedCount();
+  $('kMastered').textContent = masteredCount();
+  $('kWrong').textContent = Object.keys(state.wrong).length;
+  $('kToday').textContent = wordsLearnedToday();
+
+  var todayWords = pickTodayWords(state.cfg.dailyWords);
+  $('wordHint').textContent = '今天这一组：'+todayWords.length+' 个词；学完会自动记进「已学」。';
+
+  var html = '';
+  todayWords.forEach(function(v){
+    var s = vstat(v.w);
+    html += '<div class="wrow"><div><span class="w">'+escapeHtml(v.w)+'</span> '+
+      '<span class="ipa">/'+escapeHtml(v.p)+'/</span><div class="cn">'+escapeHtml(v.c)+'</div></div>'+
+      '<div class="acts">'+
+      (s.mastered?'<span class="badge" style="background:#e8f6ed;color:#1f7a44">已掌握</span>':'')+
+      '<button class="mini" data-say="'+escapeHtml(v.w)+'">🔊</button>'+
+      '</div></div>';
+  });
+  $('todayWords').innerHTML = html || '<div class="empty">今天的词都掌握了，休息一下</div>';
+  Array.prototype.forEach.call($('todayWords').querySelectorAll('[data-say]'), function(b){
+    b.onclick = function(){ speak(b.dataset.say); };
+  });
+}
+
+/* ================= 渲染：错题本 ================= */
+function renderWrong(){
+  var list = wrongList();
+  if (!list.length){
+    $('wrongList').innerHTML = '<div class="empty">还没有错词。答错的词会自动进这里。</div>';
+    return;
+  }
+  var byKey = {}; VOCAB.forEach(function(v){ byKey[wordKey(v.w)] = v; });
+  var html = '';
+  list.forEach(function(x){
+    var v = byKey[x.key]; if (!v) return;
+    html += '<div class="wrow"><div><span class="w">'+escapeHtml(v.w)+'</span> '+
+      '<span class="ipa">/'+escapeHtml(v.p)+'/</span>'+
+      '<div class="cn">'+escapeHtml(v.c)+'</div></div>'+
+      '<span class="badge">错 '+(x.info.count||0)+' 次</span>'+
+      '<div class="acts">'+
+      '<button class="mini" data-say="'+escapeHtml(v.w)+'">🔊</button>'+
+      '<button class="mini" data-rm="'+x.key+'">移除</button>'+
+      '</div></div>';
+  });
+  $('wrongList').innerHTML = html;
+  Array.prototype.forEach.call($('wrongList').querySelectorAll('[data-say]'), function(b){
+    b.onclick = function(){ speak(b.dataset.say); };
+  });
+  Array.prototype.forEach.call($('wrongList').querySelectorAll('[data-rm]'), function(b){
+    b.onclick = function(){ delete state.wrong[b.dataset.rm]; afterChange(); };
+  });
+}
+
+/* ================= 发音 ================= */
+var VOICE = null;
+function pickVoice(){
+  if (!window.speechSynthesis) return;
+  var vs = speechSynthesis.getVoices() || [];
+  VOICE = vs.filter(function(v){ return /en[-_]US/i.test(v.lang); })[0]
+       || vs.filter(function(v){ return /^en/i.test(v.lang); })[0] || null;
+}
+if (window.speechSynthesis){
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+}
+function speak(text){
+  if (!window.speechSynthesis){ alert('这个浏览器不支持语音播放，可以换 Chrome / Edge 试试。'); return; }
+  try{
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.9; u.pitch = 1;
+    if (VOICE) u.voice = VOICE;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ================= 学习会话 ================= */
+var S = null;
+
+function startSession(words, mode){
+  if (!words.length){ alert('没有要练的词了。'); return; }
+  S = { mode: mode||'today', list: words, phase:'preview', pi:0, queue:[], total: words.length,
+        right:0, wrong:0, cur:null, misses:{}, done:0, blocked:false };
+  $('overlay').classList.add('show');
+  showPreview();
+}
+
+function showPreview(){
+  var v = S.list[S.pi];
+  updateOvBar();
+  $('ovPhase').textContent = '先看一遍 · 第 '+(S.pi+1)+' / '+S.list.length+' 个';
+  $('ovStat').textContent = '';
+  $('ovBody').innerHTML =
+    '<div class="wcard">'+
+      '<div class="big">'+escapeHtml(v.w)+'</div>'+
+      '<div class="ipa">/'+escapeHtml(v.p)+'/</div>'+
+      '<div class="cn">'+escapeHtml(v.c)+'</div>'+
+      '<div class="cat">'+escapeHtml(v.cat)+' · 重要度 '+'★'.repeat(v.s||1)+'</div>'+
+      '<button class="speak" id="btnSpeak">🔊 听发音</button>'+
+    '</div>'+
+    '<button class="bigbtn" id="btnNextCard">'+(S.pi===S.list.length-1?'看完了，开始测验':'下一个 →')+'</button>'+
+    '<p class="hint" style="text-align:center">看完一遍再测验，记得更牢。</p>';
+  $('btnSpeak').onclick = function(){ speak(v.w); };
+  $('btnNextCard').onclick = function(){
+    if (S.pi < S.list.length-1){ S.pi++; showPreview(); return; }
+    if (S.mode === 'preview'){ closeOverlay(); return; }
+    startQuiz();
+  };
+  setTimeout(function(){ speak(v.w); }, 120);
+}
+
+function startQuiz(){
+  S.phase = 'quiz';
+  S.queue = S.list.map(function(v){ return {v:v, type: pickType(v)}; });
+  nextQuestion();
+}
+
+function pickType(v){
+  var len = v.w.replace(/\s/g,'').length;
+  if (len <= 4) return 'blank';
+  return Math.random() < 0.55 ? 'audio' : 'blank';
+}
+
+function updateOvBar(){
+  var done = S.phase==='preview' ? (S.pi+1) : S.done;
+  var total = S.phase==='preview' ? S.list.length : Math.max(S.total, S.done + S.queue.length);
+  var pct = total ? Math.round(done/total*100) : 0;
+  $('ovBar').style.width = pct+'%';
+  $('ovCount').textContent = done+'/'+total;
+}
+
+function nextQuestion(){
+  if (!S.queue.length){ finishSession(); return; }
+  var item = S.queue.shift();
+  S.cur = item;
+  S.blocked = false;
+  var v = item.v;
+  updateOvBar();
+  $('ovPhase').textContent = item.type==='audio' ? '听音拼词' : '补全字母';
+  $('ovStat').textContent = '✓ '+S.right+'　✗ '+S.wrong;
+
+  var head = '';
+  if (item.type === 'audio'){
+    head = '<div class="wcard" style="padding:30px 20px">'+
+      '<div style="font-size:44px;line-height:1">🔊</div>'+
+      '<button class="speak" id="btnReplay" style="margin-top:14px">再听一遍</button>'+
+      '<div class="cat" style="margin-top:12px">'+escapeHtml(v.cat || '')+'</div>'+
+      '</div>'+
+      '<div class="qtext">听发音，把单词完整拼出来</div>';
+  } else {
+    var masked = maskWord(v.w);
+    head = '<div class="qtext">补全被挖掉的字母</div>'+
+      '<div class="mask">'+escapeHtml(masked).replace(/_/g,'<em>_</em>')+'</div>'+
+      '<div class="wcard" style="padding:12px 20px"><div class="cat">'+escapeHtml(v.c)+'</div>'+
+      '<button class="speak" id="btnReplay" style="margin-top:10px">🔊 听一下</button></div>';
+  }
+
+  $('ovBody').innerHTML = head +
+    '<input class="answer" id="ansInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="输入完整单词">'+
+    '<button class="submit" id="btnSubmit">确认</button>';
+  var input = $('ansInput');
+  input.focus();
+  input.onkeydown = function(e){ if (e.key==='Enter') submitAnswer(); };
+  $('btnSubmit').onclick = submitAnswer;
+  $('btnReplay').onclick = function(){ speak(v.w); };
+  if (item.type === 'audio') setTimeout(function(){ speak(v.w); }, 150);
+}
+
+function submitAnswer(){
+  if (S.blocked) return;
+  var v = S.cur.v;
+  var val = normalizeAnswer($('ansInput').value);
+  if (!val) return;
+  S.blocked = true;
+  var ok = val === normalizeAnswer(v.w);
+  var k = wordKey(v.w);
+
+  if (ok){
+    S.right++; S.done++;
+    setVstat(v.w, { seen: vstat(v.w).seen+1, right: vstat(v.w).right+1,
+                    streak: vstat(v.w).streak+1, last: Date.now(),
+                    mastered: (vstat(v.w).streak+1) >= 2 });
+    if (state.wrong[k]){
+      var w = state.wrong[k];
+      w.good = (w.good||0)+1;
+      if (w.good >= 2) delete state.wrong[k];
+    }
+  } else {
+    S.wrong++;
+    setVstat(v.w, { seen: vstat(v.w).seen+1, wrong: vstat(v.w).wrong+1, streak:0, last: Date.now() });
+    var rec = state.wrong[k] || {count:0, good:0, last:0};
+    rec.count++; rec.good = 0; rec.last = Date.now();
+    state.wrong[k] = rec;
+    S.misses[k] = (S.misses[k]||0)+1;
+    /* 放回队列：隔 3 个词后再来一次 */
+    var item = {v:v, type: S.cur.type==='audio' ? 'blank' : 'audio'};
+    var pos = Math.min(3, S.queue.length);
+    S.queue.splice(pos, 0, item);
+  }
+  persist();
+
+  var fb = '<div class="fb '+(ok?'ok':'no')+'">'+
+    (ok ? '✓ 对了' : '✗ 不对，正确答案是') +
+    '<div class="ans">'+escapeHtml(v.w)+'</div>'+
+    '<div class="ipa">/'+escapeHtml(v.p)+'/　'+escapeHtml(v.c)+'</div>'+
+    '</div>'+
+    '<button class="nextbtn" id="btnNextQ">'+(S.queue.length?'下一个 →':'练完了')+'</button>';
+  $('ovBody').innerHTML = fb;
+  $('btnNextQ').onclick = nextQuestion;
+  $('btnNextQ').focus();
+  if (ok) setTimeout(function(){ speak(v.w); }, 120);
+}
+
+function finishSession(){
+  S.phase = 'done';
+  updateOvBar();
+  $('ovPhase').textContent = '完成';
+  $('ovStat').textContent = '';
+  var n = S.list.length, bad = Object.keys(S.misses).length;
+  $('ovBody').innerHTML =
+    '<div class="wcard"><div style="font-size:40px">🎉</div>'+
+    '<div style="font-size:20px;font-weight:700;margin-top:8px">这一组练完了</div>'+
+    '<div style="color:#5b6878;margin-top:10px;font-size:14px">'+n+' 个词　答对 '+S.right+' 次　答错 '+S.wrong+' 次</div>'+
+    (bad ? '<div style="color:#b4372f;margin-top:6px;font-size:13px">'+bad+' 个词进错了错题本</div>' : '<div style="color:#1f7a44;margin-top:6px;font-size:13px">全部一次过，厉害</div>')+
+    '</div>'+
+    '<button class="bigbtn" id="btnAgain">再练一遍错的</button>'+
+    '<button class="bigbtn sec" id="btnQuit">回到打卡</button>';
+  $('btnAgain').onclick = function(){
+    var bads = Object.keys(S.misses).map(function(k){
+      return VOCAB.filter(function(v){ return wordKey(v.w)===k; })[0];
+    }).filter(Boolean);
+    if (!bads.length){ alert('这组没有错词。'); return; }
+    startSession(bads, 'wrong');
+  };
+  $('btnQuit').onclick = closeOverlay;
+  $('ovBar').style.width = '100%';
+  $('ovCount').textContent = n+'/'+n;
+}
+
+function closeOverlay(){
+  $('overlay').classList.remove('show');
+  S = null;
+  render();
+}
+
+/* ================= 同步 ================= */
+var SYNC = { lan:false, timer:null };
+function afterChange(){ persist(); render(); pushSoon(); }
+
+function mergeRecords(a,b){
+  var out = {}, days = {};
+  Object.keys(a||{}).forEach(function(d){ days[d]=1; });
+  Object.keys(b||{}).forEach(function(d){ days[d]=1; });
+  Object.keys(days).forEach(function(day){
+    var x=(a&&a[day])||{}, y=(b&&b[day])||{}, rec={};
+    HABITS.forEach(function(h){
+      var vx=x[h.key], vy=y[h.key];
+      if (vx==='yes'||vy==='yes') rec[h.key]='yes';
+      else if (vx==='no'||vy==='no') rec[h.key]='no';
+    });
+    var note=y.note||x.note; if(note) rec.note=note;
+    if (Object.keys(rec).length) out[day]=rec;
+  });
+  return out;
+}
+function mergeVocab(a,b){
+  var out={};
+  Object.keys(a||{}).concat(Object.keys(b||{})).forEach(function(k){
+    var x=(a||{})[k], y=(b||{})[k];
+    if (!x){ out[k]=y; return; }
+    if (!y){ out[k]=x; return; }
+    out[k] = {
+      seen: Math.max(x.seen||0,y.seen||0), right: Math.max(x.right||0,y.right||0),
+      wrong: Math.max(x.wrong||0,y.wrong||0), streak: Math.max(x.streak||0,y.streak||0),
+      mastered: !!(x.mastered||y.mastered), last: Math.max(x.last||0,y.last||0)
+    };
+  });
+  return out;
+}
+function mergeWrong(a,b){
+  var out={};
+  Object.keys(a||{}).concat(Object.keys(b||{})).forEach(function(k){
+    var x=(a||{})[k], y=(b||{})[k];
+    if (!x){ out[k]=y; return; }
+    if (!y){ out[k]=x; return; }
+    out[k]={count:Math.max(x.count||0,y.count||0), good:Math.max(x.good||0,y.good||0), last:Math.max(x.last||0,y.last||0)};
+  });
+  return out;
+}
+function mergeAll(remote){
+  state.records = mergeRecords(state.records, remote.records||{});
+  state.vocab = mergeVocab(state.vocab, remote.vocab||{});
+  state.wrong = mergeWrong(state.wrong, remote.wrong||{});
+  if (remote.cfg && remote.cfg.start) state.cfg = sanitizeCfg(Object.assign({}, state.cfg, {
+    start: remote.cfg.start || state.cfg.start,
+    exam: remote.cfg.exam || state.cfg.exam,
+    dailyWords: remote.cfg.dailyWords || state.cfg.dailyWords
+  }));
+}
+
+/* --- 局域网 --- */
+function lanGet(){ return fetch('api/state',{cache:'no-store'}).then(function(r){ return r.ok?r.json():null; }); }
+function lanPost(){
+  return fetch('api/state',{method:'POST',headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({records:state.records,cfg:state.cfg,vocab:state.vocab,wrong:state.wrong})})
+    .then(function(r){ return r.ok?r.json():null; });
+}
+
+/* --- GitHub Gist --- */
+function ghHeaders(){
+  var h = {'Accept':'application/vnd.github+json'};
+  if (state.cfg.token) h['Authorization'] = 'Bearer ' + state.cfg.token;
+  return h;
+}
+function gistRead(){
+  if (!state.cfg.token || !state.cfg.gist) return Promise.resolve(null);
+  return fetch('https://api.github.com/gists/'+state.cfg.gist, {headers:ghHeaders()})
+    .then(function(r){ if(!r.ok) throw new Error('Gist 读取失败 '+r.status); return r.json(); })
+    .then(function(j){
+      var f = j.files && j.files['ruankao.json'];
+      if (!f) return null;
+      var content = f.content;
+      if (f.truncated && f.raw_url){
+        return fetch(f.raw_url,{headers:ghHeaders()}).then(function(r){ return r.text(); })
+          .then(function(t){ return JSON.parse(t); });
+      }
+      return JSON.parse(content);
+    });
+}
+function gistWrite(){
+  if (!state.cfg.token) return Promise.reject(new Error('没填 Token'));
+  var payload = {description:'软考打卡数据', public:false,
+    files:{'ruankao.json':{content: JSON.stringify({
+      records:state.records, vocab:state.vocab, wrong:state.wrong,
+      cfg:{start:state.cfg.start, exam:state.cfg.exam, dailyWords:state.cfg.dailyWords}
+    })}}};
+  if (!state.cfg.gist){
+    return fetch('https://api.github.com/gists',{method:'POST',headers:ghHeaders(),
+      body:JSON.stringify(payload)}).then(function(r){
+        if(!r.ok) throw new Error('创建 Gist 失败 '+r.status);
+        return r.json();
+      }).then(function(j){ state.cfg.gist = j.id; persist(); return j; });
+  }
+  return fetch('https://api.github.com/gists/'+state.cfg.gist,{method:'PATCH',headers:ghHeaders(),
+    body:JSON.stringify(payload)}).then(function(r){
+      if(!r.ok) throw new Error('写入 Gist 失败 '+r.status);
+      return r.json();
+    });
+}
+
+function syncChip(){
+  var el = $('syncChip'); if (!el) return;
+  if (state.cfg.token && state.cfg.gist){ el.className='pill ok'; el.textContent='● 云端已连接'; }
+  else if (SYNC.lan){ el.className='pill ok'; el.textContent='● 局域网同步'; }
+  else { el.className='pill'; el.textContent='○ 仅本机保存'; }
+}
+function pushSoon(){
+  clearTimeout(SYNC.timer);
+  SYNC.timer = setTimeout(function(){ doPush().catch(function(){}); }, 2500);
+}
+function doPush(){
+  var jobs = [];
+  if (SYNC.lan) jobs.push(lanPost());
+  if (state.cfg.token) jobs.push(gistWrite());
+  return Promise.all(jobs);
+}
+function syncNow(manual){
+  var jobs = [];
+  if (SYNC.lan) jobs.push(lanGet().then(function(remote){ if (remote) mergeAll(remote); }).catch(function(){}));
+  if (state.cfg.token)
+    jobs.push(gistRead().then(function(remote){ if (remote) mergeAll(remote); })
+      .catch(function(e){
+        // gist 不存在（404）时不必中断，后面写入会自动新建
+        if (/ 404$/.test(e.message)) return;
+        throw e;
+      }));
+  if (!jobs.length){
+    if (manual) alert('还没有配置同步：可以在这里填 GitHub Token（推荐），或用「启动同步服务.bat」打开本页走局域网。');
+    return Promise.resolve();
+  }
+  return Promise.all(jobs).then(function(){
+    persist();
+    if (typeof document !== 'undefined') render();
+    return doPush();
+  }).then(function(){
+    if (manual) alert(state.cfg.gist ? ('同步完成，数据已写入 Gist ' + state.cfg.gist) : '同步完成。');
+  }).catch(function(e){
+    if (manual) alert('同步失败：' + e.message + '\n\n常见原因：Token 复制不完整、没有勾 gist 权限、Token 已过期。');
+  });
+}
+
+/* ================= 导入导出 ================= */
+function download(name,text,type){
+  var blob=new Blob([text],{type:type||'application/json;charset=utf-8'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },500);
+}
+function exportJson(){ download('软考打卡_'+todayStr()+'.json', JSON.stringify(state,null,2)); }
+function exportCsv(){
+  var rows=['日期,周次,星期,学习,锻炼,英语,备注'];
+  eachDay(state.cfg.start,state.cfg.end).forEach(function(ds){
+    var r=state.records[ds]; if(!r) return;
+    var cells=HABITS.map(function(h){ var m=r[h.key]; return m==='yes'?'✓':(m==='no'?'✗':''); });
+    rows.push([ds,'W'+weekNo(ds,state.cfg.start),'周'+weekdayCN(ds)].concat(cells)
+      .concat([(r.note||'').replace(/,/g,'，')]).join(','));
+  });
+  download('软考打卡_'+todayStr()+'.csv','\ufeff'+rows.join('\r\n'),'text/csv;charset=utf-8');
+}
+function importJson(file){
+  var fr=new FileReader();
+  fr.onload=function(){
+    try{
+      var o=JSON.parse(fr.result);
+      if(!o||!o.records) throw new Error('格式不对');
+      if(!confirm('用文件里的数据覆盖当前数据？')) return;
+      state.records=o.records; state.vocab=o.vocab||{}; state.wrong=o.wrong||{};
+      if(o.cfg) state.cfg=sanitizeCfg(Object.assign({},state.cfg,o.cfg));
+      afterChange();
+      alert('导入完成。');
+    }catch(e){ alert('导入失败：'+e.message); }
+  };
+  fr.readAsText(file,'utf-8');
+}
+
+/* ================= 启动 ================= */
+/* 探测当前站点是否真的挂着同步服务：托管在 GitHub Pages 时没有 /api/state，要退回纯 Gist 模式 */
+function detectLan(){
+  if (typeof location === 'undefined') return Promise.resolve(false);
+  if (location.protocol !== 'http:' && location.protocol !== 'https:') return Promise.resolve(false);
+  return fetch('api/state', {cache:'no-store'}).then(function(r){
+    if (!r.ok) return false;
+    return r.json().then(function(){ return true; }).catch(function(){ return false; });
+  }).catch(function(){ return false; });
+}
+
+function init(){
+  load();
+
+  render();
+
+  /* 切页 */
+  Array.prototype.forEach.call(document.querySelectorAll('nav.tabs button'), function(b){
+    b.onclick = function(){
+      Array.prototype.forEach.call(document.querySelectorAll('nav.tabs button'), function(x){ x.className=''; });
+      b.className='on';
+      ['checkin','words','wrong'].forEach(function(v){
+        $('view-'+v).classList.toggle('hide', v!==b.dataset.view);
+      });
+    };
+  });
+
+  $('noteInput').addEventListener('change', function(){
+    var ds=todayStr(), r=state.records[ds]||{}, v=this.value.trim();
+    if(v) r.note=v; else delete r.note;
+    if(Object.keys(r).length) state.records[ds]=r; else delete state.records[ds];
+    afterChange();
+  });
+
+  $('btnStart').onclick = function(){
+    var words = pickTodayWords(state.cfg.dailyWords);
+    if (!words.length){ alert('词库都掌握了，厉害。'); return; }
+    startSession(words,'today');
+  };
+  $('btnPreviewAll').onclick = function(){
+    var words = pickTodayWords(state.cfg.dailyWords);
+    if (!words.length){ alert('词库都掌握了，厉害。'); return; }
+    startSession(words,'preview');
+  };
+  $('btnPracticeWrong').onclick = function(){
+    var byKey={}; VOCAB.forEach(function(v){ byKey[wordKey(v.w)]=v; });
+    var words = wrongList().map(function(x){ return byKey[x.key]; }).filter(Boolean);
+    if (!words.length){ alert('错题本是空的。'); return; }
+    startSession(words,'wrong');
+  };
+  $('btnClearWrong').onclick = function(){
+    if (!confirm('清空错题本？')) return;
+    state.wrong = {}; afterChange();
+  };
+
+  $('btnSync').onclick = function(){ syncNow(true); };
+  $('btnExport').onclick = exportJson;
+  $('btnCsv').onclick = exportCsv;
+  $('btnImport').onclick = function(){ $('fileIn').click(); };
+  $('fileIn').onchange = function(){ if(this.files[0]) importJson(this.files[0]); this.value=''; };
+
+  $('ovClose').onclick = function(){
+    if (S && S.phase!=='done' && !confirm('退出这一组？已经练过的会保留。')) return;
+    closeOverlay();
+  };
+
+  $('btnSet').onclick = function(){
+    $('examInput').value = state.cfg.exam;
+    $('startInput').value = state.cfg.start;
+    $('tokenInput').value = state.cfg.token;
+    $('gistInput').value = state.cfg.gist;
+    $('modal').classList.add('show');
+  };
+  $('btnClose').onclick = function(){
+    if ($('examInput').value) state.cfg.exam = $('examInput').value;
+    if ($('startInput').value) state.cfg.start = $('startInput').value;
+    state.cfg.token = $('tokenInput').value.trim();
+    state.cfg.gist = $('gistInput').value.trim();
+    $('modal').classList.remove('show');
+    afterChange();
+  };
+  $('btnCloud').onclick = function(){
+    state.cfg.token = $('tokenInput').value.trim();
+    state.cfg.gist = $('gistInput').value.trim();
+    persist();
+    syncNow(true).then(function(){ $('gistInput').value = state.cfg.gist; render(); });
+  };
+  $('btnCloudClear').onclick = function(){
+    if(!confirm('清除云端配置（数据不会删）？')) return;
+    state.cfg.token=''; state.cfg.gist='';
+    $('tokenInput').value=''; $('gistInput').value='';
+    afterChange();
+  };
+  $('btnClear').onclick = function(){
+    if(!confirm('确定清空全部打卡记录？建议先导出 JSON 备份。')) return;
+    state.records={}; afterChange();
+  };
+  $('modal').onclick = function(e){ if(e.target===this) this.classList.remove('show'); };
+
+  /* 启动同步：先探测局域网服务，再拉云端数据 */
+  detectLan().then(function(ok){
+    SYNC.lan = ok;
+    syncChip();
+    return syncNow(false);
+  }).then(function(){ render(); }).catch(function(){});
+}
+if (typeof document !== 'undefined') init();
+</script>
+</body>
+</html>
