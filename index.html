@@ -866,6 +866,18 @@ function closeOverlay(){
 var SYNC = { lan:false, timer:null };
 function afterChange(){ persist(); render(); pushSoon(); }
 
+/* 另一台设备改了数据后，本页需要主动拉一次才看得到：
+   切回标签页时、以及每隔 2 分钟各拉一次（正在背单词时不打扰） */
+var LAST_PULL = 0;
+function maybePull(){
+  if (typeof document === 'undefined') return;
+  if (Date.now() - LAST_PULL < 20000) return;
+  var ov = document.getElementById('overlay');
+  if (ov && ov.className.indexOf('show') >= 0) return;
+  LAST_PULL = Date.now();
+  syncNow(false).then(function(){ render(); }).catch(function(){});
+}
+
 function mergeRecords(a,b){
   var out = {}, days = {};
   Object.keys(a||{}).forEach(function(d){ days[d]=1; });
@@ -1147,6 +1159,10 @@ function init(){
     syncChip();
     return syncNow(false);
   }).then(function(){ render(); }).catch(function(){});
+
+  LAST_PULL = Date.now();
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden) maybePull(); });
+  window.addEventListener('focus', function(){ maybePull(); });  setInterval(function(){ if (!document.hidden) maybePull(); }, 120000);
 }
 if (typeof document !== 'undefined') init();
 </script>
